@@ -1,0 +1,4 @@
+pluginname=OwnCloudPlugin
+pluginclassname=OwnCloudPlugin
+version=1.0
+origin=data-quest
