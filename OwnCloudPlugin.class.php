@@ -1,7 +1,5 @@
 <?php
 
-StudipAutoloader::addAutoloadPath(__DIR__ . '/vendor/oauth2-client/src');
-
 class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
 
     public function getFileSelectNavigation()
