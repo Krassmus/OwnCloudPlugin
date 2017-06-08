@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__."/classes/OAuth.class.php";
+
 class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
 
     public function getFileSelectNavigation()
@@ -23,6 +25,8 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
         if ($url[strlen($url) - 1] !== "/") {
             $url .= "/";
         }
+        $webdav = $url . "remote.php/webdav";
+
         if ($parts['query']) {
             $url .= "?".$parts['query'];
         }
@@ -117,7 +121,8 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
         return PluginEngine::getURL($this, array(), "configure/myarea");
     }
 
-    public function hasSearch() {
+    public function hasSearch()
+    {
         return false;
     }
 

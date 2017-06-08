@@ -33,12 +33,12 @@ class OauthController extends PluginController
 
         $url .= "?response_type=code&client_id=";
         $url .= urlencode(Config::get()->OWNCLOUD_CLIENT_ID ?: UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_CLIENT_ID);
-        $url .= "&redirect_uri=".urlencode(PluginEngine::getURL($this->plugin, array(), "oauth/receive_access_token_action"));
+        $url .= "&redirect_uri=".urlencode(PluginEngine::getURL($this->plugin, array(), "oauth/receive_access_token_action", true));
 
         $provider = new \League\OAuth2\Client\Provider\GenericProvider([
             'clientId'                => Config::get()->OWNCLOUD_CLIENT_ID ?: UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_CLIENT_ID,    // The client ID assigned to you by the provider
             'clientSecret'            => Config::get()->OWNCLOUD_CLIENT_SECRET ?: UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_CLIENT_SECRET,   // The client password assigned to you by the provider
-            'redirectUri'             => PluginEngine::getURL($this->plugin, array(), "oauth/receive_access_token"),
+            'redirectUri'             => PluginEngine::getURL($this->plugin, array(), "oauth/receive_access_token", true),
             'urlAuthorize'            => $owncloud."index.php/apps/oauth2/authorize",
             'urlAccessToken'          => $owncloud."index.php/apps/oauth2/api/v1/token",
             'urlResourceOwnerDetails' => $owncloud."index.php/apps/oauth2/resource"
@@ -66,7 +66,7 @@ class OauthController extends PluginController
         $provider = new \League\OAuth2\Client\Provider\GenericProvider([
             'clientId'                => Config::get()->OWNCLOUD_CLIENT_ID ?: UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_CLIENT_ID,    // The client ID assigned to you by the provider
             'clientSecret'            => Config::get()->OWNCLOUD_CLIENT_SECRET ?: UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_CLIENT_SECRET,   // The client password assigned to you by the provider
-            'redirectUri'             => PluginEngine::getURL($this->plugin, array(), "oauth/receive_access_token_action"),
+            'redirectUri'             => PluginEngine::getURL($this->plugin, array(), "oauth/receive_access_token_action", true),
             'urlAuthorize'            => $owncloud."index.php/apps/oauth2/authorize",
             'urlAccessToken'          => $owncloud."index.php/apps/oauth2/api/v1/token",
             'urlResourceOwnerDetails' => $owncloud."index.php/apps/oauth2/resource"
@@ -80,6 +80,11 @@ class OauthController extends PluginController
         echo 'Refresh Token: ' . $accessToken->getRefreshToken() . "<br>";
         echo 'Expired in: ' . $accessToken->getExpires() . "<br>";
         echo 'Already expired? ' . ($accessToken->hasExpired() ? 'expired' : 'not expired') . "<br>";
+
+        $config = UserConfig::get($GLOBALS['user']->id);
+        $config->store("OWNCLOUD_ACCESS_TOKEN", $accessToken->getToken());
+        $config->store("OWNCLOUD_ACCESS_TOKEN_EXPIRES", $accessToken->getExpires());
+        $config->store("OWNCLOUD_REFRESH_TOKEN", $accessToken->getRefreshToken());
 
         $this->render_nothing();
     }

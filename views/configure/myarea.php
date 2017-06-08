@@ -1,8 +1,8 @@
 <form action="<?= PluginEngine::getLink($plugin, array(), "configure/myarea") ?>"
       method="post"
       data-dialog
-      class="default"
-      sautocomplete="off">
+      class="default owncloud"
+      autocomplete="off">
 
     <fieldset>
         <legend>
@@ -36,6 +36,13 @@
                 <?= _("Secret") ?>
                 <input type="text" name="owncloud[client_secret]" value="<?= htmlReady(UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_CLIENT_SECRET) ?>">
             </label>
+
+            <label>
+                <? URLHelper::setBaseURL($GLOBALS['ABSOLUTE_URI_STUDIP']) ?>
+                <?= _("Redirect-URI (zum Eintragen in der OwnCloud)") ?>
+                <input type="text" readonly value="<?= htmlReady(PluginEngine::getURL($plugin, array(), "oauth/receive_access_token"), true) ?>">
+                <? URLHelper::setBaseURL("/") ?>
+            </label>
         <? endif ?>
 
         <label>
@@ -48,3 +55,13 @@
         <?= \Studip\Button::create(_("Speichern")) ?>
     </div>
 </form>
+
+<style>
+    form.default.owncloud input[readonly] {
+        background-color: #e1e3e4;
+        background-image: url(<?= Icon::create("lock-locked", "info_alt")->asImagePath() ?>);
+        background-repeat: no-repeat;
+        background-position: calc(100% - 5px) 4px;
+        background-size: 20px 20px;
+    }
+</style>
