@@ -30,18 +30,22 @@ class OauthController extends PluginController
             $owncloud .= "/";
         }
         URLHelper::setBaseURL($GLOBALS['ABSOLUTE_URI_STUDIP']);
+        $client_id = Config::get()->OWNCLOUD_CLIENT_ID ?: UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_CLIENT_ID;
+        $redirect_uri = PluginEngine::getURL($this->plugin, array(), "oauth/receive_access_token_action", true);
 
         $url = $owncloud."index.php/apps/oauth2/authorize";
 
         $_SESSION['oauth2state'] = sha1(uniqid());
-        $url .= "?response_type=code&client_id=";
-        $url .= urlencode(Config::get()->OWNCLOUD_CLIENT_ID ?: UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_CLIENT_ID);
-        $url .= "&redirect_uri=".urlencode(PluginEngine::getURL($this->plugin, array(), "oauth/receive_access_token_action", true))."&state=".urlencode($_SESSION['oauth2state']);
+        $url .= "?state=".urlencode($_SESSION['oauth2state'])
+                . "&response_type=code"
+                . "approval_prompt=auto"
+                . "&client_id=".urlencode($client_id)
+                . "&redirect_uri=".urlencode($redirect_uri);
 
         $provider = new \League\OAuth2\Client\Provider\GenericProvider([
-            'clientId'                => Config::get()->OWNCLOUD_CLIENT_ID ?: UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_CLIENT_ID,    // The client ID assigned to you by the provider
+            'clientId'                => $client_id,    // The client ID assigned to you by the provider
             'clientSecret'            => Config::get()->OWNCLOUD_CLIENT_SECRET ?: UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_CLIENT_SECRET,   // The client password assigned to you by the provider
-            'redirectUri'             => PluginEngine::getURL($this->plugin, array(), "oauth/receive_access_token", true),
+            'redirectUri'             => $redirect_uri,
             'urlAuthorize'            => $owncloud."index.php/apps/oauth2/authorize",
             'urlAccessToken'          => $owncloud."index.php/apps/oauth2/api/v1/token",
             'urlResourceOwnerDetails' => $owncloud."index.php/apps/oauth2/resource"
@@ -52,7 +56,7 @@ class OauthController extends PluginController
 
         //die($authorizationUrl);
 
-        header("Location: ".$authorizationUrl);
+        header("Location: ".$url);
         $this->render_nothing();
     }
 
