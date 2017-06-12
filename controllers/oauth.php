@@ -31,7 +31,7 @@ class OauthController extends PluginController
         }
         URLHelper::setBaseURL($GLOBALS['ABSOLUTE_URI_STUDIP']);
         $client_id = Config::get()->OWNCLOUD_CLIENT_ID ?: UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_CLIENT_ID;
-        $redirect_uri = PluginEngine::getURL($this->plugin, array(), "oauth/receive_access_token_action", true);
+        $redirect_uri = PluginEngine::getURL($this->plugin, array(), "oauth/receive_access_token", true);
 
         $url = $owncloud."index.php/apps/oauth2/authorize";
 
@@ -57,7 +57,7 @@ class OauthController extends PluginController
 
         //die($authorizationUrl);
 
-        header("Location: ".$authorizationUrl);
+        header("Location: ".$url);
         $this->render_nothing();
     }
 
