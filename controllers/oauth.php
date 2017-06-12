@@ -30,13 +30,15 @@ class OauthController extends PluginController
             $owncloud .= "/";
         }
         URLHelper::setBaseURL($GLOBALS['ABSOLUTE_URI_STUDIP']);
+
         $url = $owncloud."index.php/apps/oauth2/authorize";
 
+        $_SESSION['oauth2state'] = sha1(uniqid());
         $url .= "?response_type=code&client_id=";
         $url .= urlencode(Config::get()->OWNCLOUD_CLIENT_ID ?: UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_CLIENT_ID);
-        $url .= "&redirect_uri=".urlencode(PluginEngine::getURL($this->plugin, array(), "oauth/receive_access_token_action", true));
+        $url .= "&redirect_uri=".urlencode(PluginEngine::getURL($this->plugin, array(), "oauth/receive_access_token_action", true))."&state=".urlencode($_SESSION['oauth2state']);
 
-        $provider = new \League\OAuth2\Client\Provider\GenericProvider([
+        /*$provider = new \League\OAuth2\Client\Provider\GenericProvider([
             'clientId'                => Config::get()->OWNCLOUD_CLIENT_ID ?: UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_CLIENT_ID,    // The client ID assigned to you by the provider
             'clientSecret'            => Config::get()->OWNCLOUD_CLIENT_SECRET ?: UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_CLIENT_SECRET,   // The client password assigned to you by the provider
             'redirectUri'             => PluginEngine::getURL($this->plugin, array(), "oauth/receive_access_token", true),
@@ -44,13 +46,13 @@ class OauthController extends PluginController
             'urlAccessToken'          => $owncloud."index.php/apps/oauth2/api/v1/token",
             'urlResourceOwnerDetails' => $owncloud."index.php/apps/oauth2/resource"
         ]);
-        $authorizationUrl = $provider->getAuthorizationUrl();
+        $authorizationUrl = $provider->getAuthorizationUrl();*/
 
-        $_SESSION['oauth2state'] = $provider->getState();
+        //$_SESSION['oauth2state'] = $provider->getState();
 
         //die($authorizationUrl);
 
-        header("Location: ".$authorizationUrl);
+        header("Location: ".$url);
         $this->render_nothing();
     }
 
@@ -89,8 +91,12 @@ class OauthController extends PluginController
         $config->store("OWNCLOUD_ACCESS_TOKEN_EXPIRES", $accessToken->getExpires());
         $config->store("OWNCLOUD_REFRESH_TOKEN", $accessToken->getRefreshToken());*/
 
-
-
+        if (Request::get("state") !== $_SESSION['oauth2state']) {
+            var_dump(Request::get("state"));
+            var_dump($_SESSION['oauth2state']);
+            die();
+            throw new AccessDeniedException();
+        }
 
 
         $header = array();
