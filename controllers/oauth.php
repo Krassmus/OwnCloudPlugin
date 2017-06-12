@@ -98,24 +98,25 @@ class OauthController extends PluginController
 
         $client_id  = \Config::get()->OWNCLOUD_CLIENT_ID ?: \UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_CLIENT_ID;
         $client_secret = \Config::get()->OWNCLOUD_CLIENT_SECRET ?: \UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_CLIENT_SECRET;
+        $redirect_uri = PluginEngine::getURL($this->plugin, array(), "oauth/receive_access_token", true);
 
         $payload = array(
             'grant_type' => "authorization_code",
             'code' => Request::get("code"),
-            'redirect_uri' => PluginEngine::getURL($this->plugin, array(), "oauth/receive_access_token", true),
+            'redirect_uri' => $redirect_uri,
             'client_id' => $client_id,    // The client ID assigned to you by the provider
             'client_secret' => $client_secret,   // The client password assigned to you by the provider
             'format' => "json"
         );
 
         $r = curl_init();
-        curl_setopt($r, CURLOPT_URL, $owncloud."index.php/apps/oauth2/authorize");
+        curl_setopt($r, CURLOPT_URL, $owncloud."index.php/apps/oauth2/authorize?grant_type=authorization_code&code=".urlencode(Request::get("code"))."&redirect_uri=".urlencode($redirect_uri));
         curl_setopt($r, CURLOPT_USERPWD, $client_id . ":" . $client_secret);
-        curl_setopt($r, CURLOPT_POST, 1);
+        //curl_setopt($r, CURLOPT_POST, 1);
         curl_setopt($r, CURLOPT_HTTPHEADER, studip_utf8encode($header));
         curl_setopt($r, CURLOPT_RETURNTRANSFER, 1);
 
-        curl_setopt($r, CURLOPT_POSTFIELDS, studip_utf8encode($payload));
+        //curl_setopt($r, CURLOPT_POSTFIELDS, studip_utf8encode($payload));
 
         $result = curl_exec($r);
         $curl_info = curl_getinfo($r);
