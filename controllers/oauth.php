@@ -90,8 +90,8 @@ class OauthController extends PluginController
         //unset $_SESSION['oauth2state'];
 
 
-        $client_id  = \Config::get()->OWNCLOUD_CLIENT_ID ?: \UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_CLIENT_ID;
-        $client_secret = \Config::get()->OWNCLOUD_CLIENT_SECRET ?: \UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_CLIENT_SECRET;
+        $client_id  = \Config::get()->OWNCLOUD_CLIENT_ID ?: \UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_CLIENT_ID; // The client ID assigned to you by the provider
+        $client_secret = \Config::get()->OWNCLOUD_CLIENT_SECRET ?: \UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_CLIENT_SECRET; // The client password assigned to you by the provider
         URLHelper::setBaseURL($GLOBALS['ABSOLUTE_URI_STUDIP']);
         $redirect_uri = PluginEngine::getURL($this->plugin, array(), "oauth/receive_access_token", true);
 
@@ -99,10 +99,9 @@ class OauthController extends PluginController
             'grant_type' => "authorization_code",
             'code' => Request::get("code"),
             'redirect_uri' => $redirect_uri,
-            //'client_id' => $client_id,    // The client ID assigned to you by the provider
-            //'client_secret' => $client_secret,   // The client password assigned to you by the provider
-            //'format' => "json"
-
+            'client_id' => $client_id,
+            'client_secret' => $client_secret,
+            'format' => "json"
         );
 
         $header = array();
@@ -110,8 +109,8 @@ class OauthController extends PluginController
         $header[] = "Authorization: Basic ".base64_encode($client_id . ":" .$client_secret);
 
         $r = curl_init();
-        //curl_setopt($r, CURLOPT_URL, $owncloud."index.php/apps/oauth2/authorize?grant_type=authorization_code&code=".urlencode(Request::get("code"))."&redirect_uri=".urlencode($redirect_uri));
-        curl_setopt($r, CURLOPT_URL, $owncloud."index.php/apps/oauth2/authorize");
+        curl_setopt($r, CURLOPT_URL, $owncloud."index.php/apps/oauth2/authorize?grant_type=authorization_code&code=".urlencode(Request::get("code"))."&redirect_uri=".urlencode($redirect_uri));
+        //curl_setopt($r, CURLOPT_URL, $owncloud."index.php/apps/oauth2/authorize");
         //curl_setopt($r, CURLOPT_USERPWD, $client_id . ":" . $client_secret);
         curl_setopt($r, CURLOPT_POST, 1);
         curl_setopt($r, CURLOPT_HTTPHEADER, studip_utf8encode($header));
