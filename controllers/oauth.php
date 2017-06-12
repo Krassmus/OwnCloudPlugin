@@ -39,8 +39,9 @@ class OauthController extends PluginController
         $url .= "?state=".urlencode($_SESSION['oauth2state'])
                 . "&response_type=code"
                 . "&approval_prompt=auto"
-                . "&client_id=".urlencode($client_id)
-                . "&redirect_uri=".urlencode($redirect_uri);
+                . "&redirect_uri=".urlencode($redirect_uri)
+                . "&client_id=".urlencode($client_id);
+
 
         $provider = new \League\OAuth2\Client\Provider\GenericProvider([
             'clientId'                => $client_id,    // The client ID assigned to you by the provider
