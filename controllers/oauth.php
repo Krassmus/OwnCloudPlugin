@@ -38,7 +38,7 @@ class OauthController extends PluginController
         $_SESSION['oauth2state'] = sha1(uniqid());
         $url .= "?state=".urlencode($_SESSION['oauth2state'])
                 . "&response_type=code"
-                . "approval_prompt=auto"
+                . "&approval_prompt=auto"
                 . "&client_id=".urlencode($client_id)
                 . "&redirect_uri=".urlencode($redirect_uri);
 
