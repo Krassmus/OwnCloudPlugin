@@ -57,7 +57,7 @@ class OauthController extends PluginController
 
         //die($authorizationUrl);
 
-        header("Location: ".$url);
+        header("Location: ".$authorizationUrl);
         $this->render_nothing();
     }
 
