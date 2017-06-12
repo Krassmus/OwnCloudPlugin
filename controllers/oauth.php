@@ -35,7 +35,7 @@ class OauthController extends PluginController
 
         $url = $owncloud."index.php/apps/oauth2/authorize";
 
-        $_SESSION['oauth2state'] = sha1(uniqid());
+        $_SESSION['oauth2state'] = md5(uniqid());
         $url .= "?state=".urlencode($_SESSION['oauth2state'])
                 . "&response_type=code"
                 . "&approval_prompt=auto"
