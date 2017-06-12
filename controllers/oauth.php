@@ -38,7 +38,7 @@ class OauthController extends PluginController
         $url .= urlencode(Config::get()->OWNCLOUD_CLIENT_ID ?: UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_CLIENT_ID);
         $url .= "&redirect_uri=".urlencode(PluginEngine::getURL($this->plugin, array(), "oauth/receive_access_token_action", true))."&state=".urlencode($_SESSION['oauth2state']);
 
-        /*$provider = new \League\OAuth2\Client\Provider\GenericProvider([
+        $provider = new \League\OAuth2\Client\Provider\GenericProvider([
             'clientId'                => Config::get()->OWNCLOUD_CLIENT_ID ?: UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_CLIENT_ID,    // The client ID assigned to you by the provider
             'clientSecret'            => Config::get()->OWNCLOUD_CLIENT_SECRET ?: UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_CLIENT_SECRET,   // The client password assigned to you by the provider
             'redirectUri'             => PluginEngine::getURL($this->plugin, array(), "oauth/receive_access_token", true),
@@ -46,13 +46,13 @@ class OauthController extends PluginController
             'urlAccessToken'          => $owncloud."index.php/apps/oauth2/api/v1/token",
             'urlResourceOwnerDetails' => $owncloud."index.php/apps/oauth2/resource"
         ]);
-        $authorizationUrl = $provider->getAuthorizationUrl();*/
+        $authorizationUrl = $provider->getAuthorizationUrl();
 
         //$_SESSION['oauth2state'] = $provider->getState();
 
         //die($authorizationUrl);
 
-        header("Location: ".$url);
+        header("Location: ".$authorizationUrl);
         $this->render_nothing();
     }
 
