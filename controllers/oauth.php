@@ -63,7 +63,7 @@ class OauthController extends PluginController
             $owncloud .= "/";
         }
 
-        $provider = new \League\OAuth2\Client\Provider\GenericProvider([
+        /*$provider = new \League\OAuth2\Client\Provider\GenericProvider([
             'clientId'                => Config::get()->OWNCLOUD_CLIENT_ID ?: UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_CLIENT_ID,    // The client ID assigned to you by the provider
             'clientSecret'            => Config::get()->OWNCLOUD_CLIENT_SECRET ?: UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_CLIENT_SECRET,   // The client password assigned to you by the provider
             'redirectUri'             => PluginEngine::getURL($this->plugin, array(), "oauth/receive_access_token_action", true),
@@ -76,6 +76,8 @@ class OauthController extends PluginController
             'code' => Request::get("code")
         ]);
 
+
+
         echo 'Access Token: ' . $accessToken->getToken() . "<br>";
         echo 'Refresh Token: ' . $accessToken->getRefreshToken() . "<br>";
         echo 'Expired in: ' . $accessToken->getExpires() . "<br>";
@@ -84,7 +86,45 @@ class OauthController extends PluginController
         $config = UserConfig::get($GLOBALS['user']->id);
         $config->store("OWNCLOUD_ACCESS_TOKEN", $accessToken->getToken());
         $config->store("OWNCLOUD_ACCESS_TOKEN_EXPIRES", $accessToken->getExpires());
-        $config->store("OWNCLOUD_REFRESH_TOKEN", $accessToken->getRefreshToken());
+        $config->store("OWNCLOUD_REFRESH_TOKEN", $accessToken->getRefreshToken());*/
+
+
+
+
+
+        $header = array();
+
+        $header[] = "Accept: application/json";
+
+        $payload = array(
+            'grant_type' => "authorization_code",
+            'code' => Request::get("code"),
+            'redirect_uri' => PluginEngine::getURL($this->plugin, array(), "oauth/receive_access_token", true),
+            'client_id' => \Config::get()->OWNCLOUD_CLIENT_ID ?: \UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_CLIENT_ID,    // The client ID assigned to you by the provider
+            'client_secret' => \Config::get()->OWNCLOUD_CLIENT_SECRET ?: \UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_CLIENT_SECRET,   // The client password assigned to you by the provider
+            'format' => "json"
+        );
+
+        $r = curl_init();
+        curl_setopt($r, CURLOPT_URL, $owncloud."index.php/apps/oauth2/authorize");
+        curl_setopt($r, CURLOPT_POST, 1);
+        curl_setopt($r, CURLOPT_HTTPHEADER, studip_utf8encode($header));
+        curl_setopt($r, CURLOPT_RETURNTRANSFER, 1);
+
+        curl_setopt($r, CURLOPT_POSTFIELDS, studip_utf8encode($payload));
+
+        $result = curl_exec($r);
+        $curl_info = curl_getinfo($r);
+        curl_close($r);
+
+        $header_size = $curl_info['header_size'];
+        $header = substr($result, 0, $header_size);
+        $body = studip_utf8decode(json_decode(substr($result, $header_size), true));
+        var_dump(($result));
+
+        $config = \UserConfig::get($GLOBALS['user']->id);
+        $config->store("OWNCLOUD_ACCESS_TOKEN", $body['access_token']);
+        $config->store("OWNCLOUD_ACCESS_TOKEN_EXPIRES", time() + $body['expires_in']);
 
         $this->render_nothing();
     }
