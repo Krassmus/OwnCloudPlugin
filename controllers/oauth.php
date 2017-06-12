@@ -29,6 +29,7 @@ class OauthController extends PluginController
         if ($owncloud[strlen($owncloud) - 1] !== "/") {
             $owncloud .= "/";
         }
+        URLHelper::setBaseURL($GLOBALS['ABSOLUTE_URI_STUDIP']);
         $url = $owncloud."index.php/apps/oauth2/authorize";
 
         $url .= "?response_type=code&client_id=";
@@ -98,6 +99,7 @@ class OauthController extends PluginController
 
         $client_id  = \Config::get()->OWNCLOUD_CLIENT_ID ?: \UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_CLIENT_ID;
         $client_secret = \Config::get()->OWNCLOUD_CLIENT_SECRET ?: \UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_CLIENT_SECRET;
+        URLHelper::setBaseURL($GLOBALS['ABSOLUTE_URI_STUDIP']);
         $redirect_uri = PluginEngine::getURL($this->plugin, array(), "oauth/receive_access_token", true);
 
         $payload = array(
