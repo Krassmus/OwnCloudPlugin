@@ -121,7 +121,8 @@ class OauthController extends PluginController
         $result = curl_exec($r);
         $curl_info = curl_getinfo($r);
         curl_close($r);
-        var_dump(($result));
+        var_dump($curl_info);
+        var_dump($result);
 
         $header_size = $curl_info['header_size'];
         $header = substr($result, 0, $header_size);
