@@ -107,11 +107,11 @@ class OauthController extends PluginController
         $header = array();
         $header[] = "Accept: application/json";
         $header[] = "Authorization: Basic ".base64_encode($client_id . ":" .$client_secret);
+        var_dump("Authorization: Basic ".base64_encode($client_id . ":" .$client_secret));
 
         $r = curl_init();
         curl_setopt($r, CURLOPT_URL, $owncloud."index.php/apps/oauth2/authorize?grant_type=authorization_code&code=".urlencode(Request::get("code"))."&redirect_uri=".urlencode($redirect_uri));
         //curl_setopt($r, CURLOPT_URL, $owncloud."index.php/apps/oauth2/authorize");
-        //curl_setopt($r, CURLOPT_USERPWD, $client_id . ":" . $client_secret);
         curl_setopt($r, CURLOPT_POST, 1);
         curl_setopt($r, CURLOPT_HTTPHEADER, studip_utf8encode($header));
         curl_setopt($r, CURLOPT_RETURNTRANSFER, 1);
@@ -121,11 +121,12 @@ class OauthController extends PluginController
         $result = curl_exec($r);
         $curl_info = curl_getinfo($r);
         curl_close($r);
+        var_dump(($result));
 
         $header_size = $curl_info['header_size'];
         $header = substr($result, 0, $header_size);
         $body = studip_utf8decode(json_decode(substr($result, $header_size), true));
-        var_dump(($result));
+
 
         $config = \UserConfig::get($GLOBALS['user']->id);
         $config->store("OWNCLOUD_ACCESS_TOKEN", $body['access_token']);
