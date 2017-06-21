@@ -75,7 +75,11 @@ class OauthController extends PluginController
 
         $json = studip_utf8decode(json_decode($json, true));
 
-        //var_dump($json);
+        if (false) {
+            var_dump($json);
+            $this->render_nothing();
+            return;
+        }
 
         if ($json['error']) {
             PageLayout::postError(_("Authentifizierungsfehler:")." ".$json['error']);
