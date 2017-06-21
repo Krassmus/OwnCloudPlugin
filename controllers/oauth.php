@@ -75,6 +75,8 @@ class OauthController extends PluginController
 
         $json = studip_utf8decode(json_decode($json), true);
 
+        var_dump($json);
+
         $config = \UserConfig::get($GLOBALS['user']->id);
         $config->store("OWNCLOUD_ACCESS_TOKEN", $json['access_token']);
         $config->store("OWNCLOUD_REFRESH_TOKEN", $json['refresh_token']);
