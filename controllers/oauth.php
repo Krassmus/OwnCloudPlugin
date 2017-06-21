@@ -71,6 +71,7 @@ class OauthController extends PluginController
         $json = curl_exec($r);
         $curl_info = curl_getinfo($r);
         curl_close($r);
+        var_dump($json);
 
         $json = studip_utf8decode(json_decode($json), true);
 
