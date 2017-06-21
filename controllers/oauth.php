@@ -75,10 +75,10 @@ class OauthController extends PluginController
 
         $json = studip_utf8decode(json_decode($json, true));
 
-        var_dump($json);
+        //var_dump($json);
 
         if ($json['error']) {
-            PageLayout::postError(_"Authentifizierungsfehler:"." ".$json['error']);
+            PageLayout::postError(_("Authentifizierungsfehler:")." ".$json['error']);
             $this->redirect(URLHelper::getURL("dispatch.php/files/index"));
         } else {
             $config = \UserConfig::get($GLOBALS['user']->id);
