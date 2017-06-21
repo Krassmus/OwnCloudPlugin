@@ -69,26 +69,24 @@ class OauthController extends PluginController
         curl_setopt($r, CURLOPT_POSTFIELDS, studip_utf8encode($payload));
 
         $json = curl_exec($r);
-        $curl_info = curl_getinfo($r);
         curl_close($r);
-        var_dump($json);
 
         $json = studip_utf8decode(json_decode($json, true));
-
-        if (false) {
-            var_dump($json);
-            $this->render_nothing();
-            return;
-        }
 
         if ($json['error']) {
             PageLayout::postError(_("Authentifizierungsfehler:")." ".$json['error']);
             $this->redirect(URLHelper::getURL("dispatch.php/files/index"));
         } else {
+            if (false) {
+                var_dump($json);
+                $this->render_nothing();
+                return;
+            }
             $config = \UserConfig::get($GLOBALS['user']->id);
             $config->store("OWNCLOUD_ACCESS_TOKEN", $json['access_token']);
             $config->store("OWNCLOUD_REFRESH_TOKEN", $json['refresh_token']);
             $config->store("OWNCLOUD_ACCESS_TOKEN_EXPIRES", time() + $json['expires_in']);
+            PageLayout::postSuccess(_("Erfolgreich verknüpft!"));
             $this->redirect(URLHelper::getURL("dispatch.php/files/index"));
         }
 
