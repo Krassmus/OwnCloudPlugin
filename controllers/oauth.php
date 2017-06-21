@@ -113,7 +113,7 @@ class OauthController extends PluginController
         curl_setopt($r, CURLOPT_URL, $owncloud."index.php/apps/oauth2/authorize?grant_type=authorization_code&code=".urlencode(Request::get("code"))."&redirect_uri=".urlencode($redirect_uri));
         //curl_setopt($r, CURLOPT_URL, $owncloud."index.php/apps/oauth2/authorize");
         curl_setopt($r, CURLOPT_POST, 1);
-        curl_setopt($r, CURLOPT_HTTPHEADER, studip_utf8encode($header));
+        curl_setopt($r, CURLOPT_HTTPHEADER, ($header)); //studip_utf8encode
         curl_setopt($r, CURLOPT_RETURNTRANSFER, 1);
 
         curl_setopt($r, CURLOPT_POSTFIELDS, studip_utf8encode($payload));
@@ -136,3 +136,4 @@ class OauthController extends PluginController
         $this->render_nothing();
     }
 }
+
