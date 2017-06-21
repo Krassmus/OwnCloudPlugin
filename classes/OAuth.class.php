@@ -65,10 +65,13 @@ class OAuth {
         if ($owncloud[strlen($owncloud) - 1] !== "/") {
             $owncloud .= "/";
         }
+        $client_id  = \Config::get()->OWNCLOUD_CLIENT_ID ?: \UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_CLIENT_ID; // The client ID assigned to you by the provider
+        $client_secret = \Config::get()->OWNCLOUD_CLIENT_SECRET ?: \UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_CLIENT_SECRET; // The client password assigned to you by the provider
 
         $header = array();
 
         $header[] = "Accept: application/json";
+        $header[] = "Authorization: Basic ".base64_encode($client_id . ":" .$client_secret);
 
         $payload = array(
             'grant_type' => "refresh_token",
@@ -86,15 +89,18 @@ class OAuth {
 
         curl_setopt($r, CURLOPT_POSTFIELDS, studip_utf8encode($payload));
 
-        $result = curl_exec($r);
+        $json = curl_exec($r);
         curl_close($r);
 
-        $header_size = curl_getinfo($r, CURLINFO_HEADER_SIZE);
-        $header = substr($result, 0, $header_size);
-        $body = studip_utf8decode(json_decode(substr($result, $header_size)));
+        $json = studip_utf8decode(json_decode($json, true));
 
-        $config = \UserConfig::get($GLOBALS['user']->id);
-        $config->store("OWNCLOUD_ACCESS_TOKEN", $body['access_token']);
-        $config->store("OWNCLOUD_ACCESS_TOKEN_EXPIRES", time() + $body['expires_in']);
+        if ($json['error']) {
+            PageLayout::postError(_("Authentifizierungsfehler:")." ".$json['error']);
+        } else {
+            $config = \UserConfig::get($GLOBALS['user']->id);
+            $config->store("OWNCLOUD_ACCESS_TOKEN", $json['access_token']);
+            //$config->store("OWNCLOUD_REFRESH_TOKEN", $json['refresh_token']);
+            $config->store("OWNCLOUD_ACCESS_TOKEN_EXPIRES", time() + $json['expires_in']);
+        }
     }
 }
