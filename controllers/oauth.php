@@ -107,10 +107,11 @@ class OauthController extends PluginController
         $header = array();
         $header[] = "Accept: application/json";
         $header[] = "Authorization: Basic ".base64_encode($client_id . ":" .$client_secret);
-        var_dump("Authorization: Basic ".base64_encode($client_id . ":" .$client_secret));
+        //var_dump("Authorization: Basic ".base64_encode($client_id . ":" .$client_secret));
 
         $r = curl_init();
-        curl_setopt($r, CURLOPT_URL, $owncloud."index.php/apps/oauth2/authorize?grant_type=authorization_code&code=".urlencode(Request::get("code"))."&redirect_uri=".urlencode($redirect_uri));
+        //curl_setopt($r, CURLOPT_URL, $owncloud."index.php/apps/oauth2/authorize?grant_type=authorization_code&code=".urlencode(Request::get("code"))."&redirect_uri=".urlencode($redirect_uri)); //owncloud
+        curl_setopt($r, CURLOPT_URL, $owncloud."index.php/api/v1/token?grant_type=authorization_code&code=".urlencode(Request::get("code"))."&redirect_uri=".urlencode($redirect_uri)); //nextcloud
         //curl_setopt($r, CURLOPT_URL, $owncloud."index.php/apps/oauth2/authorize");
         curl_setopt($r, CURLOPT_POST, 1);
         curl_setopt($r, CURLOPT_HTTPHEADER, ($header)); //studip_utf8encode
