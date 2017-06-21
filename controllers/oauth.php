@@ -79,6 +79,10 @@ class OauthController extends PluginController
         $config->store("OWNCLOUD_REFRESH_TOKEN", $json['refresh_token']);
         $config->store("OWNCLOUD_ACCESS_TOKEN_EXPIRES", time() + $json['expires_in']);
 
+        var_dump($json);
+
+        $this->render_nothing();
+        return;
         $this->redirect(URLHelper::getURL("dispatch.php/files/index"));
     }
 }
