@@ -9,7 +9,7 @@
             <?= _("OwnCloud konfigurieren") ?>
         </legend>
 
-        <? var_dump(Config::get()->OWNCLOUD_ACCESS_TOKEN) ?>
+        <? var_dump(\UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_ACCESS_TOKEN) ?>
 
         <? if (\Owncloud\OAuth::isReady()) : ?>
             <?= MessageBox::info(_("OwnCloud-Rechte sind freigegeben")) ?>

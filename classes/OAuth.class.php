@@ -44,10 +44,10 @@ class OAuth {
     static public function getAccessToken()
     {
         if (self::hasAccessToken()) {
-            return \Config::get()->OWNCLOUD_ACCESS_TOKEN;
-        } elseif(\Config::get()->OWNCLOUD_REFRESH_TOKEN) {
+            return \UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_ACCESS_TOKEN;
+        } elseif(\UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_REFRESH_TOKEN) {
             self::refreshAccessToken();
-            return \Config::get()->OWNCLOUD_ACCESS_TOKEN;
+            return \UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_ACCESS_TOKEN;
         } else {
             return false;
         }
@@ -55,8 +55,8 @@ class OAuth {
 
     static public function hasAccessToken()
     {
-        return \Config::get()->OWNCLOUD_ACCESS_TOKEN
-            && (\Config::get()->OWNCLOUD_ACCESS_TOKEN_EXPIRES >= time());
+        return \UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_ACCESS_TOKEN
+            && (\UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_ACCESS_TOKEN_EXPIRES >= time());
     }
 
     static public function refreshAccessToken()
@@ -72,7 +72,7 @@ class OAuth {
 
         $payload = array(
             'grant_type' => "refresh_token",
-            'refresh_token' => \Config::get()->OWNCLOUD_REFRESH_TOKEN,
+            'refresh_token' => \UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_REFRESH_TOKEN,
             'client_id' => \Config::get()->OWNCLOUD_CLIENT_ID ?: \UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_CLIENT_ID,    // The client ID assigned to you by the provider
             'client_secret' => \Config::get()->OWNCLOUD_CLIENT_SECRET ?: \UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_CLIENT_SECRET,   // The client password assigned to you by the provider
             'format' => "json"
