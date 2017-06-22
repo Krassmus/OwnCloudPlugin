@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__."/classes/OAuth.class.php";
+include __DIR__.'/vendor/autoload.php';
 
 class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
 
@@ -26,6 +27,17 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
             $url .= "/";
         }
         $webdav = $url . "remote.php/webdav";
+
+        $client = new \Sabre\DAV\Client(array(
+            'baseUri' => $webdav
+        ));
+
+        $response = $client->request('GET', "", null, array(
+            "Authorization:Bearer ".\Owncloud\OAuth::getAccessToken()
+        ));
+
+        var_dump($response);die();
+
 
         if ($parts['query']) {
             $url .= "?".$parts['query'];
