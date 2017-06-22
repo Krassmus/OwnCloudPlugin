@@ -32,7 +32,7 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
             'baseUri' => $webdav
         ));
         $response = $client->request('GET', "", null, array(
-            "Authorization: Bearer ".\Owncloud\OAuth::getAccessToken()
+            "Authentication" => "Bearer ".\Owncloud\OAuth::getAccessToken()
         ));
 
         var_dump($response);die();
