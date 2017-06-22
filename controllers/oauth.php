@@ -30,8 +30,6 @@ class OauthController extends PluginController
     public function receive_access_token_action()
     {
         //Save the access token and refresh-token
-        Request::get("code");
-
         $owncloud = Config::get()->OWNCLOUD_ENDPOINT ?: UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_ENDPOINT;
         if ($owncloud[strlen($owncloud) - 1] !== "/") {
             $owncloud .= "/";

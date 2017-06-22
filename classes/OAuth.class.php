@@ -76,8 +76,9 @@ class OAuth {
         $payload = array(
             'grant_type' => "refresh_token",
             'refresh_token' => \UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_REFRESH_TOKEN,
-            'client_id' => \Config::get()->OWNCLOUD_CLIENT_ID ?: \UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_CLIENT_ID,    // The client ID assigned to you by the provider
-            'client_secret' => \Config::get()->OWNCLOUD_CLIENT_SECRET ?: \UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_CLIENT_SECRET,   // The client password assigned to you by the provider
+            'access_token' => \UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_ACCESS_TOKEN,
+            'client_id' => $client_id,
+            'client_secret' => $client_secret,
             'format' => "json"
         );
 
@@ -91,6 +92,9 @@ class OAuth {
 
         $json = curl_exec($r);
         curl_close($r);
+
+        echo "Refresh-Response: ";
+        var_dump($json); die();
 
         $json = studip_utf8decode(json_decode($json, true));
 
