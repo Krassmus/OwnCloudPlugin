@@ -88,6 +88,11 @@ class OAuth {
         curl_setopt($r, CURLOPT_HTTPHEADER, studip_utf8encode($header));
         curl_setopt($r, CURLOPT_RETURNTRANSFER, 1);
 
+        var_dump($payload);
+        echo "\n<br><br>\n";
+        var_dump(studip_utf8encode($payload));
+        die();
+
         curl_setopt($r, CURLOPT_POSTFIELDS, studip_utf8encode($payload));
 
         $json = curl_exec($r);
