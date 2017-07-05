@@ -70,16 +70,16 @@ class OAuth {
 
         $header = array();
 
-        $header[] = "Accept: application/json";
         $header[] = "Authorization: Basic ".base64_encode($client_id . ":" .$client_secret);
+        $header[] = "Accept: application/json";
 
         $payload = array(
             'grant_type' => "refresh_token",
             'refresh_token' => \UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_REFRESH_TOKEN,
-            'access_token' => \UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_ACCESS_TOKEN,
             'client_id' => $client_id,
             'client_secret' => $client_secret,
-            'format' => "json"
+            'format' => "json",
+            'access_token' => \UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_ACCESS_TOKEN
         );
 
         $r = curl_init();
