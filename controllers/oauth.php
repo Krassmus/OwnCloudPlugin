@@ -61,15 +61,15 @@ class OauthController extends PluginController
         $r = curl_init();
         curl_setopt($r, CURLOPT_URL, $owncloud."index.php/apps/oauth2/api/v1/token?grant_type=authorization_code&code=".urlencode(Request::get("code"))."&redirect_uri=".urlencode($redirect_uri)); //nextcloud
         curl_setopt($r, CURLOPT_POST, 1);
-        curl_setopt($r, CURLOPT_HTTPHEADER, ($header)); //studip_utf8encode
+        curl_setopt($r, CURLOPT_HTTPHEADER, $header);
         curl_setopt($r, CURLOPT_RETURNTRANSFER, 1);
 
-        curl_setopt($r, CURLOPT_POSTFIELDS, studip_utf8encode($payload));
+        curl_setopt($r, CURLOPT_POSTFIELDS, $payload);
 
         $json = curl_exec($r);
         curl_close($r);
 
-        $json = studip_utf8decode(json_decode($json, true));
+        $json = json_decode($json, true);
 
         if ($json['error']) {
             PageLayout::postError(_("Authentifizierungsfehler:")." ".$json['error']);
@@ -84,7 +84,7 @@ class OauthController extends PluginController
             $config->store("OWNCLOUD_ACCESS_TOKEN", $json['access_token']);
             $config->store("OWNCLOUD_REFRESH_TOKEN", $json['refresh_token']);
             $config->store("OWNCLOUD_ACCESS_TOKEN_EXPIRES", time() + $json['expires_in']);
-            PageLayout::postSuccess(_("Erfolgreich verknüpft!"));
+            PageLayout::postSuccess(_("Erfolgreich verknï¿½pft!"));
             $this->redirect(URLHelper::getURL("dispatch.php/files/index"));
         }
 

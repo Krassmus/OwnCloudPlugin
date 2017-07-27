@@ -6,11 +6,6 @@ class OAuth {
 
     static public function request($url, $type = "get", $payload = array())
     {
-        $owncloud = \Config::get()->OWNCLOUD_ENDPOINT ?: \UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_ENDPOINT;
-        if ($owncloud[strlen($owncloud) - 1] !== "/") {
-            $owncloud .= "/";
-        }
-
         $header = array();
 
         $accessToken = self::getAccessToken();
@@ -23,17 +18,15 @@ class OAuth {
         $r = curl_init();
         curl_setopt($r, CURLOPT_URL, $url);
         curl_setopt($r, CURLOPT_POST, $type === "get" ? 0 : 1);
-        curl_setopt($r, CURLOPT_HTTPHEADER, studip_utf8encode($header));
+        curl_setopt($r, CURLOPT_HTTPHEADER, $header);
         curl_setopt($r, CURLOPT_RETURNTRANSFER, 1);
 
-        curl_setopt($r, CURLOPT_POSTFIELDS, studip_utf8encode($payload));
+        curl_setopt($r, CURLOPT_POSTFIELDS, $payload);
 
         $result = curl_exec($r);
         curl_close($r);
 
-        $header_size = curl_getinfo($r, CURLINFO_HEADER_SIZE);
-        $header = substr($result, 0, $header_size);
-        $body = substr($result, $header_size);
+        return $result;
     }
 
     static public function isReady()
@@ -85,15 +78,10 @@ class OAuth {
         $r = curl_init();
         curl_setopt($r, CURLOPT_URL, $owncloud."index.php/apps/oauth2/api/v1/token");
         curl_setopt($r, CURLOPT_POST, 1);
-        curl_setopt($r, CURLOPT_HTTPHEADER, studip_utf8encode($header));
+        curl_setopt($r, CURLOPT_HTTPHEADER, $header);
         curl_setopt($r, CURLOPT_RETURNTRANSFER, 1);
 
-        var_dump($payload);
-        echo "\n<br><br>\n";
-        var_dump(studip_utf8encode($payload));
-        die();
-
-        curl_setopt($r, CURLOPT_POSTFIELDS, studip_utf8encode($payload));
+        curl_setopt($r, CURLOPT_POSTFIELDS, $payload);
 
         $json = curl_exec($r);
         curl_close($r);
@@ -101,7 +89,7 @@ class OAuth {
         echo "Refresh-Response: ";
         var_dump($json); die();
 
-        $json = studip_utf8decode(json_decode($json, true));
+        $json = json_decode($json, true);
 
         if ($json['error']) {
             PageLayout::postError(_("Authentifizierungsfehler:")." ".$json['error']);

@@ -10,10 +10,10 @@
         </legend>
 
         <? if (\Owncloud\OAuth::isReady()) : ?>
-            <?= MessageBox::info(_("OwnCloud ist verknüpft")) ?>
+            <?= MessageBox::info(_("OwnCloud ist verknÃ¼pft")) ?>
         <? elseif(UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_ENDPOINT) : ?>
             <div style="text-align: center;">
-                <?= \Studip\LinkButton::create(_("OwnCloud für Stud.IP freigeben"), PluginEngine::getURL($plugin, array(), "oauth/request_access_token")) ?>
+                <?= \Studip\LinkButton::create(_("OwnCloud fÃ¼r Stud.IP freigeben"), PluginEngine::getURL($plugin, array(), "oauth/request_access_token")) ?>
             </div>
         <? endif ?>
 
