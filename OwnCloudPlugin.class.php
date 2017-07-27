@@ -30,7 +30,7 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
 
 
 
-        $header = array();
+        /*$header = array();
         $header[] = "Authorization: Bearer ".\Owncloud\OAuth::getAccessToken();
 
         $r = curl_init();
@@ -42,7 +42,7 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
         curl_close($r);
 
         var_dump($json);
-        die();
+        die();*/
 
 
 
