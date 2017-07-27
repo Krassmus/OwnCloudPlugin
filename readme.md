@@ -6,10 +6,11 @@ Mit diesem Plugin kann man ab der Stud.IP-Version 4.0 eine Owncloud (oder Nextcl
 ## Installation
 
 1. Das Plugin wird ganz normal in Stud.IP per Drag&Drop installiert. 
-2. Die OwnCloud braucht die [OAuth2-App](https://github.com/owncloud/oauth2/releases), die installiert und aktiviert werden muss. Wer nur Stud.IP gewohnt ist: OAuth2 heißt im Owncloud-Kontext zwar "App", ist aber das gleiche wie bei Stud.IP ein Plugin. Die Dateien müssen in das Owncloud-Verzeichnis unter `./apps/oauth2` abgelegt werden.
-3. Die OAuth2 "App" muss als Admin im Webinterface von Owncloud aktiviert werden unter "Einstellungen" (oben rechts unter dem Nutzernamen) -> Apps -> "Deaktivierte Apps anzeigen" -> "aktivieren".
-4. Es muss in Owncloud ein Client angelegt werden. Unter Administration -> "Additional" einen neuen Client anlegen. Name ist dabei egal (vielleicht ja Stud.IP).
-5. Jetzt hat man einen OAuth2-Client erstellt und kopiert Client-ID und das Secret. Wichtig ist dabei, dass man die korrekte Redirect-URI angibt. Owncloud überprüft diese URI penibel. Sie sollte in etwa lauten `https://meinstud.ip/plugins.php/owncloudplugin/oauth/receive_access_token`. Auch sollte HTTPS aktiv sein.
+2. Die OwnCloud braucht die [OAuth2-App](https://github.com/owncloud/oauth2/releases), die installiert und aktiviert werden muss. Wer nur Stud.IP gewohnt ist: OAuth2 heißt im Owncloud-Kontext zwar "App", ist aber das gleiche wie bei Stud.IP ein Plugin. Die Dateien müssen in das Owncloud-Verzeichnis unter `./apps/oauth2` abgelegt werden. 
+3. Für OAuth in der OwnCloud hinter einem Apache braucht man das mod_rewrite und mod_env Modul, das die Regel `RewriteRule .* - [env=HTTP_AUTHORIZATION:%{HTTP:Authorization}]` umsetzt. Wenn das nicht aktiv ist, kann OAuth nicht funktionieren, weil der Apache alle Authorization-Header entfernt.
+4. Die OAuth2 "App" muss als Admin im Webinterface von Owncloud aktiviert werden unter "Einstellungen" (oben rechts unter dem Nutzernamen) -> Apps -> "Deaktivierte Apps anzeigen" -> "aktivieren".
+5. Es muss in Owncloud ein Client angelegt werden. Unter Administration -> "Additional" einen neuen Client anlegen. Name ist dabei egal (vielleicht ja Stud.IP).
+6. Jetzt hat man einen OAuth2-Client erstellt und kopiert Client-ID und das Secret. Wichtig ist dabei, dass man die korrekte Redirect-URI angibt. Owncloud überprüft diese URI penibel. Sie sollte in etwa lauten `https://meinstud.ip/plugins.php/owncloudplugin/oauth/receive_access_token`. Auch sollte HTTPS aktiv sein.
 
 Jetzt muss man sich überlegen, wie das Owncloud-Plugin genutzt werden soll in Stud.IP. Gibt es eine zentrale OwnCloud für alle Stud.IP-Nutzer oder kümmern sich die Nutzer selbst um eine eigene OwnCloud?
 
