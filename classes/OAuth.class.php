@@ -69,6 +69,7 @@ class OAuth {
         $payload = array(
             'grant_type' => "refresh_token",
             'refresh_token' => \UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_REFRESH_TOKEN,
+            'code' => \UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_REFRESH_TOKEN,
             'client_id' => $client_id,
             'client_secret' => $client_secret,
             'format' => "json",
