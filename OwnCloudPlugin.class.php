@@ -35,7 +35,7 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
 
         $r = curl_init();
         curl_setopt($r, CURLOPT_CUSTOMREQUEST, "PROPFIND");
-        curl_setopt($r, CURLOPT_URL, $webdav);
+        curl_setopt($r, CURLOPT_URL, $webdav."/".$folder_id);
         curl_setopt($r, CURLOPT_HTTPHEADER, ($header));
         curl_setopt($r, CURLOPT_RETURNTRANSFER, 1);
 
@@ -91,7 +91,7 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
             }
             if ($file_attributes['type'] === "folder") {
                 $subfolder = new VirtualFolderType(array(
-                    'id' => $folder_id."/".$file_attributes['name'],
+                    'id' => ($folder_id ? $folder_id."/" : "").$file_attributes['name'],
                     'name' => $file_attributes['name'],
                     'parent_id' => $folder_id
                 ), $this->getPluginId());
