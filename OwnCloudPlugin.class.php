@@ -34,6 +34,7 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
         $header[] = "Authorization: Bearer ".\Owncloud\OAuth::getAccessToken();
 
         $r = curl_init();
+        curl_setopt($r, CURLOPT_CUSTOMREQUEST, "PROPFIND");
         curl_setopt($r, CURLOPT_URL, $webdav);
         curl_setopt($r, CURLOPT_HTTPHEADER, ($header));
         curl_setopt($r, CURLOPT_RETURNTRANSFER, 1);
