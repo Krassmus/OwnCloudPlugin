@@ -46,7 +46,7 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
         $doc->loadXML($xml);
 
         $folder = new VirtualFolderType(array(
-            'id' => "OwnCloudTopFolder"
+            'id' => ""
         ), $this->getPluginId());
 
         foreach ($doc->getElementsByTagNameNS("DAV:","response") as $file) {
@@ -64,7 +64,7 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
             foreach ($file->childNodes as $node) {
                 if ($node->tagName === "d:href") {
                     $file_attributes['name'] = substr($node->nodeValue, strpos($node->nodeValue, "remote.php/webdav/") + 18);
-                    $file_attributes['name'] = array_pop(preg_split("/\//", $file_attributes['name'], 0, PREG_SPLIT_NO_EMPTY));
+                    $file_attributes['name'] = urldecode(array_pop(preg_split("/\//", $file_attributes['name'], 0, PREG_SPLIT_NO_EMPTY)));
                     if (!$file_attributes['name']) {
                         continue 2;
                     }
