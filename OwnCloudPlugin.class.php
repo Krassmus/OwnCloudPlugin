@@ -27,7 +27,7 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
             $url .= "/";
         }
         $webdav = $url . "remote.php/webdav/";
-
+        $root = "remote.php/webdav/".$folder_id;
 
 
         $header = array();
@@ -46,7 +46,8 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
         $doc->loadXML($xml);
 
         $folder = new VirtualFolderType(array(
-            'id' => ""
+            'id' => $folder_id,
+            'parent_id' => $folder_id ? "" : ""
         ), $this->getPluginId());
 
         foreach ($doc->getElementsByTagNameNS("DAV:","response") as $file) {
@@ -63,7 +64,7 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
 
             foreach ($file->childNodes as $node) {
                 if ($node->tagName === "d:href") {
-                    $file_attributes['name'] = substr($node->nodeValue, strpos($node->nodeValue, "remote.php/webdav/") + 18);
+                    $file_attributes['name'] = substr($node->nodeValue, strpos($node->nodeValue, $root) + strlen($root));
                     $file_attributes['name'] = urldecode(array_pop(preg_split("/\//", $file_attributes['name'], 0, PREG_SPLIT_NO_EMPTY)));
                     if (!$file_attributes['name']) {
                         continue 2;
@@ -97,7 +98,7 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
                 $folder->createSubfolder($subfolder);
             } else {
                 $folder->createFile(array(
-                    'id' => $folder_id."/".$file_attributes['name'],
+                    'id' => ($folder_id ? $folder_id."/" : "").$file_attributes['name'],
                     'name' => $file_attributes['name'],
                     'size' => $file_attributes['size'],
                     'mime_type' => $file_attributes['contenttype'],
@@ -108,27 +109,6 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
         }
 
         return $folder;
-        die();
-
-
-
-        $client = new \Sabre\DAV\Client(array(
-            'baseUri' => $webdav
-        ));
-
-        $response = $client->propfind("collection", array(
-            '{DAV:}displayname',
-            '{DAV:}getcontentlength',
-        ), 1, array(
-            "Authorization" => "Bearer ".\Owncloud\OAuth::getAccessToken()
-        ));
-
-        /*$response = $client->request('GET', "", null, array(
-            "Authorization" => "Bearer ".\Owncloud\OAuth::getAccessToken()
-        ));*/
-
-        var_dump($response);die();
-
     }
 
     public function getPreparedFile($file_id)
