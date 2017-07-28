@@ -49,7 +49,7 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
             'id' => "OwnCloudTopFolder"
         ), $this->getPluginId());
 
-        foreach ($doc->getElementsByTagName("response") as $file) {
+        foreach ($doc->getElementsByTagNameNS("DAV:","response") as $file) {
             //response
             //  -> href
             //  -> propstat
@@ -63,22 +63,23 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
 
             foreach ($file->childNodes as $node) {
                 if ($node->tagName === "d:href") {
-                    $file_attributes['name'] = html_entity_decode(array_pop(preg_split("/\//", $node->nodeValue, 0, PREG_SPLIT_NO_EMPTY)));
+                    $file_attributes['name'] = substr($node->nodeValue, strpos($node->nodeValue, "remote.php/webdav/"));
+                    $file_attributes['name'] = array_pop(preg_split("/\//", $file_attributes['name'], 0, PREG_SPLIT_NO_EMPTY));
                 }
                 if ($node->tagName === "d:propstat") {
                     foreach ($node->childNodes as $prop) {
-                        foreach ($prop->childNodes as $prop) {
-                            if ($node->tagName === "d:resourcetype") {
-                                $file_attributes['type'] = $node->childNodes[0] && $node->childNodes[0]->tagName === "d:collection" ? "folder" : "file";
+                        foreach ($prop->childNodes as $attr) {
+                            if ($attr->tagName === "d:resourcetype") {
+                                $file_attributes['type'] = $attr->childNodes[0] && $attr->childNodes[0]->tagName === "d:collection" ? "folder" : "file";
                             }
-                            if ($node->tagName === "d:getcontentlength") {
-                                $file_attributes['size'] = $node->nodeValue;
+                            if ($attr->tagName === "d:getcontentlength") {
+                                $file_attributes['size'] = $attr->nodeValue;
                             }
-                            if ($node->tagName === "d:getcontenttype") {
-                                $file_attributes['contenttype'] = $node->nodeValue;
+                            if ($attr->tagName === "d:getcontenttype") {
+                                $file_attributes['contenttype'] = $attr->nodeValue;
                             }
-                            if ($node->tagName === "d:getlastmodified") {
-                                $file_attributes['chdate'] = strtotime($node->nodeValue);
+                            if ($attr->tagName === "d:getlastmodified") {
+                                $file_attributes['chdate'] = strtotime($attr->nodeValue);
                             }
                         }
                     }
