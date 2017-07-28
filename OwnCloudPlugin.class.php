@@ -26,7 +26,7 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
         if ($url[strlen($url) - 1] !== "/") {
             $url .= "/";
         }
-        $webdav = $url . "remote.php/webdav";
+        $webdav = $url . "remote.php/webdav/";
 
 
 
@@ -49,7 +49,13 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
         $client = new \Sabre\DAV\Client(array(
             'baseUri' => $webdav
         ));
-        $response = $client->options();
+
+        $response = $client->propfind("collection", array(
+            '{DAV:}displayname',
+            '{DAV:}getcontentlength',
+        ), 1, array(
+            "Authorization" => "Bearer ".\Owncloud\OAuth::getAccessToken()
+        ));
 
         /*$response = $client->request('GET', "", null, array(
             "Authorization" => "Bearer ".\Owncloud\OAuth::getAccessToken()

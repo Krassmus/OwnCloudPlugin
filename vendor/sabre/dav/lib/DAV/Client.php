@@ -195,7 +195,7 @@ class Client extends HTTP\Client {
      * @param int $depth
      * @return array
      */
-    function propFind($url, array $properties, $depth = 0) {
+    function propFind($url, array $properties, $depth = 0, array $headers = array()) {
 
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $dom->formatOutput = true;
@@ -223,10 +223,10 @@ class Client extends HTTP\Client {
 
         $url = $this->getAbsoluteUrl($url);
 
-        $request = new HTTP\Request('PROPFIND', $url, [
+        $request = new HTTP\Request('PROPFIND', $url, array_merge([
             'Depth'        => $depth,
             'Content-Type' => 'application/xml'
-        ], $body);
+        ], $headers), $body);
 
         $response = $this->send($request);
 
