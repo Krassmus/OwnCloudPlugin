@@ -87,9 +87,6 @@ class OAuth {
         $json = curl_exec($r);
         curl_close($r);
 
-        echo "Refresh-Response: ";
-        var_dump($json); die();
-
         $json = json_decode($json, true);
 
         if ($json['error']) {
