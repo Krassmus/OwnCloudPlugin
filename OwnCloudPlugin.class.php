@@ -49,9 +49,11 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
         $client = new \Sabre\DAV\Client(array(
             'baseUri' => $webdav
         ));
-        $response = $client->request('GET', "", null, array(
+        $response = $client->options();
+
+        /*$response = $client->request('GET', "", null, array(
             "Authorization" => "Bearer ".\Owncloud\OAuth::getAccessToken()
-        ));
+        ));*/
 
         var_dump($response);die();
 
