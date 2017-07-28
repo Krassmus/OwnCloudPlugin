@@ -145,8 +145,8 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
         $info = curl_getinfo($r);
         curl_close($r);
 
-        header("Content-Length: ".$info['content_type']);
-        header("Content-Type: ".$info['size_download']);
+        header("Content-Length: ".$info['size_download']);
+        header("Content-Type: ".$info['content_type']);
         echo $content;
         return;
     }
