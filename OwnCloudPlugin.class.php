@@ -63,8 +63,11 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
 
             foreach ($file->childNodes as $node) {
                 if ($node->tagName === "d:href") {
-                    $file_attributes['name'] = substr($node->nodeValue, strpos($node->nodeValue, "remote.php/webdav/"));
+                    $file_attributes['name'] = substr($node->nodeValue, strpos($node->nodeValue, "remote.php/webdav/") + 18);
                     $file_attributes['name'] = array_pop(preg_split("/\//", $file_attributes['name'], 0, PREG_SPLIT_NO_EMPTY));
+                    if (!$file_attributes['name']) {
+                        continue 2;
+                    }
                 }
                 if ($node->tagName === "d:propstat") {
                     foreach ($node->childNodes as $prop) {
