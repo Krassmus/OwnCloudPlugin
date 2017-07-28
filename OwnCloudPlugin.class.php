@@ -30,7 +30,7 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
 
 
 
-        /*$header = array();
+        $header = array();
         $header[] = "Authorization: Bearer ".\Owncloud\OAuth::getAccessToken();
 
         $r = curl_init();
@@ -39,11 +39,57 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
         curl_setopt($r, CURLOPT_HTTPHEADER, ($header));
         curl_setopt($r, CURLOPT_RETURNTRANSFER, 1);
 
-        $json = curl_exec($r);
+        $xml = curl_exec($r);
         curl_close($r);
 
-        var_dump($json);
-        die();*/
+        $doc = new DOMDocument();
+        $doc->loadXML($xml);
+
+        $folder = new VirtualFolderType(array(
+            'id' => "OwnCloudTopFolder"
+        ), $this->getPluginId());
+
+        foreach ($doc->getElementsByTagName("d:response") as $file) {
+            $file_attributes = array();
+
+            foreach ($file->childNodes as $node) {
+                if ($node->tagName === "d:resourcetype") {
+                    $file_attributes['type'] = $node->childNodes[0] && $node->childNodes[0]->tagName === "d:collection" ? "folder" : "file";
+                }
+                if ($node->tagName === "d:href") {
+                    $file_attributes['name'] = array_pop(preg_split("/", $node->nodeValue, 0, PREG_SPLIT_NO_EMPTY));
+                }
+                if ($node->tagName === "d:getcontentlength") {
+                    $file_attributes['size'] = $node->nodeValue;
+                }
+                if ($node->tagName === "d:getcontenttype") {
+                    $file_attributes['contenttype'] = $node->nodeValue;
+                }
+                if ($node->tagName === "d:getlastmodified") {
+                    $file_attributes['chdate'] = strtotime($node->nodeValue);
+                }
+            }
+            if ($file_attributes['type'] === "folder") {
+                $subfolder = new VirtualFolderType(array(
+                    'id' => $folder_id."/".$file_attributes['name'],
+                    'name' => $file_attributes['name'],
+                    'parent_id' => $folder_id
+                ), $this->getPluginId());
+                $folder->createSubfolder($subfolder);
+            } else {
+                $folder->createFile(array(
+                    'id' => $folder_id."/".$file_attributes['name'],
+                    'name' => $file_attributes['name'],
+                    'size' => $file_attributes['size'],
+                    'mime_type' => $file_attributes['contenttype'],
+                    'description' => "",
+                    'chdate' => $file_attributes['chdate']
+                ));
+            }
+        }
+
+        return $folder;
+        die();
 
 
 
@@ -64,70 +110,6 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
 
         var_dump($response);die();
 
-
-        if ($parts['query']) {
-            $url .= "?".$parts['query'];
-        }
-        $url = URLHelper::getURL($url, array(
-            'format' => "json",
-            'response_code' => "code",
-            'client_id' => "",
-            'redirect_uri' => ""
-        ), true);
-
-
-
-        $folder = new VirtualFolderType(array(
-            'id' => "OwnCloudTopFolder"
-        ), $this->getPluginId());
-
-        $subfolder = new VirtualFolderType(array(
-            'id' => "folder1",
-            'name' => "Neuer Ordner",
-            'parent_id' => "OwnCloudTopFolder"
-        ), $this->getPluginId());
-        $subfolder->createFile(array(
-            'id' => md5(uniqid()),
-            'name' => "Statistik.xls",
-            'size' => "2102552",
-            'mime_type' => "application/xls",
-            'description' => "",
-            'chdate' => 1471104608,
-            'url' => null
-            //$item['accessInfo']['epub']['downloadLink']
-            //$item['accessInfo']['webReaderLink']
-        ));
-        if ($folder_id === "folder1") {
-            return $subfolder;
-        }
-
-        $folder->createSubfolder($subfolder);
-
-        $folder->createFile(array(
-            'id' => md5(uniqid()),
-            'name' => "TestDatei 1.pdf",
-            'size' => "102552",
-            'mime_type' => "application/pdf",
-            'description' => "",
-            'chdate' => 1477904608,
-            'url' => null
-            //$item['accessInfo']['epub']['downloadLink']
-            //$item['accessInfo']['webReaderLink']
-        ));
-
-        $folder->createFile(array(
-            'id' => md5(uniqid()),
-            'name' => "TestDatei 2.html",
-            'description' => "Zweite Testdatei",
-            'mime_type' => "text/html",
-            'size' => "152552",
-            'url' => "http://tacspac.com",
-            'chdate' => 1477914608,
-            //$item['accessInfo']['epub']['downloadLink']
-            //$item['accessInfo']['webReaderLink']
-        ));
-
-        return $folder;
     }
 
     public function getPreparedFile($file_id)
