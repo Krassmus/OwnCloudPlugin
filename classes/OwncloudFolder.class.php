@@ -4,7 +4,7 @@ class OwncloudFolder extends VirtualFolderType {
 
     public function isWritable($user_id)
     {
-        return false;
+        return true;
     }
 
     public function isEditable($user_id)
