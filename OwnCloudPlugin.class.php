@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__."/classes/OAuth.class.php";
+require_once __DIR__."/classes/OwncloudFolder.class.php";
 include __DIR__.'/vendor/autoload.php';
 
 class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
@@ -45,7 +46,7 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
         $doc = new DOMDocument();
         $doc->loadXML($xml);
 
-        $folder = new VirtualFolderType(array(
+        $folder = new OwncloudFolder(array(
             'id' => $folder_id,
             'parent_id' => $folder_id ? "" : ""
         ), $this->getPluginId());
@@ -90,7 +91,7 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
                 }
             }
             if ($file_attributes['type'] === "folder") {
-                $subfolder = new VirtualFolderType(array(
+                $subfolder = new OwncloudFolder(array(
                     'id' => ($folder_id ? $folder_id."/" : "").$file_attributes['name'],
                     'name' => $file_attributes['name'],
                     'parent_id' => $folder_id
