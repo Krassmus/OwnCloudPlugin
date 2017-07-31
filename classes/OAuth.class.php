@@ -90,15 +90,15 @@ class OAuth {
         $json = json_decode($json, true);
 
         if (!$json) {
-            URLHelper::setBaseURL($GLOBALS['ABSOLUTE_URI_STUDIP']);
+            \URLHelper::setBaseURL($GLOBALS['ABSOLUTE_URI_STUDIP']);
             //Muss den Nutzer weiterleiten auf den Server, wo der Nutzer die App freischaltet
-            $owncloud = Config::get()->OWNCLOUD_ENDPOINT ?: UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_ENDPOINT;
+            $owncloud = \Config::get()->OWNCLOUD_ENDPOINT ?: \UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_ENDPOINT;
             if ($owncloud[strlen($owncloud) - 1] !== "/") {
                 $owncloud .= "/";
             }
-            URLHelper::setBaseURL($GLOBALS['ABSOLUTE_URI_STUDIP']);
-            $client_id = Config::get()->OWNCLOUD_CLIENT_ID ?: UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_CLIENT_ID;
-            $redirect_uri = PluginEngine::getURL($this->plugin, array(), "oauth/receive_access_token", true);
+            \URLHelper::setBaseURL($GLOBALS['ABSOLUTE_URI_STUDIP']);
+            $client_id = \Config::get()->OWNCLOUD_CLIENT_ID ?: \UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_CLIENT_ID;
+            $redirect_uri = \URLHelper::getURL("plugin.php/owncloudplugin/oauth/receive_access_token", array(),  true);
 
             $url = $owncloud."index.php/apps/oauth2/authorize";
 
