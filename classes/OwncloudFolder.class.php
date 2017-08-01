@@ -139,7 +139,7 @@ class OwncloudFolder extends VirtualFolderType {
                     'id' => ($this->id ? $this->id."/" : "").$file_attributes['name'],
                     'name' => $file_attributes['name'],
                     'parent_id' => $this->id
-                ), $this->getPluginId());
+                ), $this->plugin_id);
             } else {
                 $this->files[] = (object) array(
                     'id' => ($this->id ? $this->id."/" : "").$file_attributes['name'],
