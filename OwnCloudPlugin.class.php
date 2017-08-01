@@ -20,7 +20,8 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
         $parent_folder_id = implode("/", $folder_path);
         $folder = new OwncloudFolder(array(
             'id' => $folder_id,
-            'parent_id' => $parent_folder_id
+            'parent_id' => $parent_folder_id,
+            'range_type' => $this->getPluginId()
         ), $this->getPluginId());
         return $folder;
     }
@@ -72,10 +73,10 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
         array_pop($folder_path);
         $parent_folder_id = implode("/", $folder_path);
 
-
         $folder = new OwncloudFolder(array(
             'id' => $folder_id,
-            'parent_id' => $parent_folder_id
+            'parent_id' => $parent_folder_id,
+            'range_type' => $this->getPluginId()
         ), $this->getPluginId());
 
         $file = new FileRef();
