@@ -80,6 +80,7 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
         ), $this->getPluginId());
 
         $file = new FileRef();
+        $file = $file_id;
         $file->foldertype = $folder;
 
         return $file;
