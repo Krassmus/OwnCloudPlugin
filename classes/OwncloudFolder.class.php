@@ -38,13 +38,14 @@ class OwncloudFolder extends VirtualFolderType {
 
         $r = curl_init();
         curl_setopt($r, CURLOPT_CUSTOMREQUEST, "DELETE");
-        curl_setopt($r, CURLOPT_URL, $webdav."/".$file_ref_id);
+        curl_setopt($r, CURLOPT_URL, $webdav . $file_ref_id);
         curl_setopt($r, CURLOPT_HTTPHEADER, ($header));
         curl_setopt($r, CURLOPT_RETURNTRANSFER, 1);
 
         curl_exec($r);
+        $status = curl_getinfo($r, CURLINFO_HTTP_CODE);
         curl_close($r);
-        return true;
+        return ($status >= 200) && ($status < 300);
     }
 
     /*public function createFile($filedata)
@@ -57,10 +58,7 @@ class OwncloudFolder extends VirtualFolderType {
     {
         $parts = parse_url(UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_ENDPOINT);
         $url = $parts['scheme']
-            .urlencode(UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_USERNAME)
-            .":"
-            .urlencode(UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_PASSWORD)
-            ."@"
+            ."://"
             .$parts['host']
             .($parts['port'] ? ":".$parts['port'] : "")
             .($parts['path'] ?: "");
