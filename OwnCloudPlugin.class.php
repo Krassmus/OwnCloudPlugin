@@ -68,7 +68,7 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
     public function getPreparedFile($file_id)
     {
         $folder_path = explode("/", $file_id);
-        array_pop($folder_path);
+        $filename = array_pop($folder_path);
         $folder_id = implode("/", $folder_path);
         array_pop($folder_path);
         $parent_folder_id = implode("/", $folder_path);
@@ -82,6 +82,7 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
         $file = new FileRef();
         $file->id = $file_id;
         $file->foldertype = $folder;
+        $file->name = $filename;
 
         return $file;
     }
