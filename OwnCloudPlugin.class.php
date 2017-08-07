@@ -79,10 +79,21 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
             'range_type' => $this->getPluginId()
         ), $this->getPluginId());
 
+        foreach ($folder->getFiles() as $file_info) {
+            if ($file_info->name === $filename) {
+                $info = $file_info;
+                break;
+            }
+        }
+
         $file = new FileRef();
-        $file->id = $file_id;
+        $file->id         = $file_id;
         $file->foldertype = $folder;
-        $file->name = $filename;
+        $file->name       = $filename;
+        $file->size       = $info->size;
+        $file->mime_type  = $info->mime_type;
+        $file->mkdate     = $info->chdate;
+        $file->chdate     = $info->chdate;
 
         return $file;
     }
