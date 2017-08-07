@@ -147,7 +147,7 @@ class OwncloudFolder extends VirtualFolderType {
                     'mime_type' => $file_attributes['contenttype'],
                     'description' => "",
                     'chdate' => $file_attributes['chdate'],
-                    'download_url' => PluginEngine::getURL($this, array(), "download/".($this->id ? $this->id."/" : "").$file_attributes['name'])
+                    'download_url' => URLHelper::getURL( "plugins.php/owncloudplugin/download/".($this->id ? $this->id."/" : "").$file_attributes['name'])
                 );
             }
         }
