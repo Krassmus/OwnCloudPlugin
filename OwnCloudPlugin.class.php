@@ -91,8 +91,8 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
         $file->foldertype   = $folder;
         $file->name         = $filename;
         $file->size         = $info->size;
-        $file->mime_type    = $info->download_url; 
-        $file->download_url = $info->mime_type;
+        $file->mime_type    = $info->mime_type;
+        $file->download_url = $info->download_url;
         $file->mkdate       = $info->chdate;
         $file->chdate       = $info->chdate;
 

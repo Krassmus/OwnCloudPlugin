@@ -19,6 +19,11 @@ class OwncloudFolder extends VirtualFolderType {
         return true;
     }
 
+    public function isFileDownloadable($file_id, $user_id)
+    {
+        return true;
+    }
+
     public function isFileEditable($fileref_or_id, $user_id)
     {
         return true;
