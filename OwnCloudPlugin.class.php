@@ -65,7 +65,7 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
         return;
     }
 
-    public function getPreparedFile($file_id)
+    public function getPreparedFile($file_id, $with_blob = false)
     {
         $folder_path = explode("/", $file_id);
         $filename = array_pop($folder_path);
@@ -95,6 +95,41 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
         $file->download_url = $info->download_url;
         $file->mkdate       = $info->chdate;
         $file->chdate       = $info->chdate;
+        if ($with_blob) {
+            $parts = parse_url(UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_ENDPOINT);
+            $url = $parts['scheme']
+                .urlencode(UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_USERNAME)
+                .":"
+                .urlencode(UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_PASSWORD)
+                ."@"
+                .$parts['host']
+                .($parts['port'] ? ":".$parts['port'] : "")
+                .($parts['path'] ?: "");
+            if ($url[strlen($url) - 1] !== "/") {
+                $url .= "/";
+            }
+            $webdav = $url . "remote.php/webdav/";
+
+
+            $header = array();
+            $header[] = "Authorization: Bearer ".\Owncloud\OAuth::getAccessToken();
+
+            $r = curl_init();
+            curl_setopt($r, CURLOPT_CUSTOMREQUEST, "GET");
+            curl_setopt($r, CURLOPT_URL, $webdav."/".$file_id);
+            curl_setopt($r, CURLOPT_HTTPHEADER, ($header));
+            curl_setopt($r, CURLOPT_RETURNTRANSFER, 1);
+
+            $content = curl_exec($r);
+            $info = curl_getinfo($r);
+            curl_close($r);
+            $path = $GLOBALS['TMP_PATH']."/".md5(uniqid());
+            file_put_contents(
+                $path,
+                $content
+            );
+            $file->path_to_blob = $path;
+        }
 
         return $file;
     }
