@@ -16,12 +16,14 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
     public function getFolder($folder_id = null)
     {
         $folder_path = explode("/", $folder_id);
-        array_pop($folder_path);
+        $name = array_pop($folder_path);
         $parent_folder_id = implode("/", $folder_path);
         $folder = new OwncloudFolder(array(
             'id' => $folder_id,
+            'name' => $name,
             'parent_id' => $parent_folder_id,
-            'range_type' => $this->getPluginId()
+            'range_type' => $this->getPluginId(),
+            'range_id' => $this->getPluginName()
         ), $this->getPluginId());
         return $folder;
     }
@@ -70,13 +72,15 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
         $folder_path = explode("/", $file_id);
         $filename = array_pop($folder_path);
         $folder_id = implode("/", $folder_path);
-        array_pop($folder_path);
+        $name = array_pop($folder_path);
         $parent_folder_id = implode("/", $folder_path);
 
         $folder = new OwncloudFolder(array(
             'id' => $folder_id,
+            'name' => $name,
             'parent_id' => $parent_folder_id,
-            'range_type' => $this->getPluginId()
+            'range_type' => $this->getPluginId(),
+            'range_id' => $this->getPluginName()
         ), $this->getPluginId());
 
         foreach ($folder->getFiles() as $file_info) {
