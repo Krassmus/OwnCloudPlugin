@@ -16,7 +16,7 @@ class OwncloudFolder extends VirtualFolderType {
 
     public function isEditable($user_id)
     {
-        return false;
+        return true;
     }
 
     public function isSubfolderAllowed($user_id)
@@ -37,6 +37,38 @@ class OwncloudFolder extends VirtualFolderType {
     public function isFileWritable($fileref_or_id, $user_id)
     {
         return true;
+    }
+
+
+    public function store()
+    {        
+        $old_id = $this->parent_id . '/' . $this->name;
+
+        if ($this->getId() != $old_id) {
+
+            $webdav = $this->getWebDavURL();
+            $header = array();
+            $header[] = "Authorization: Bearer ".\Owncloud\OAuth::getAccessToken();
+            $header[] = "Destination: ". $webdav . $this->id;
+    
+            $r = curl_init();
+            curl_setopt($r, CURLOPT_CUSTOMREQUEST, "MOVE");
+            curl_setopt($r, CURLOPT_URL, $webdav . $old_id);
+            curl_setopt($r, CURLOPT_HTTPHEADER, ($header));
+            curl_setopt($r, CURLOPT_RETURNTRANSFER, 1);    
+            curl_exec($r);
+            $status = curl_getinfo($r, CURLINFO_HTTP_CODE);
+            curl_close($r);
+
+            return ($status >= 200) && ($status < 300);
+
+        }
+        return false;
+    }
+
+    public function delete()
+    {
+        return $this->deleteFile($this->id);
     }
 
     public function deleteFile($file_ref_id)
@@ -60,21 +92,19 @@ class OwncloudFolder extends VirtualFolderType {
 
     public function createFile($filedata)
     {       
-        $file_ref_id = $filedata['name'];
-        $data = $filedata['tmp_name'];
-
         $webdav = $this->getWebDavURL();
+
+        $file_ref_id = $this->id . (mb_strlen($this->id)?'/':'') .  $filedata['name'];
 
         $header = array();
         $header[] = "Authorization: Bearer ".\Owncloud\OAuth::getAccessToken();
-
-        $destination = $webdav . $this->id . (mb_strlen($this->id)?'/':'') . $file_ref_id;
-
+       
+        $data = $filedata['tmp_name'];
         $fh_res = fopen($data, 'r');
 
         $r = curl_init();
         curl_setopt($r, CURLOPT_PUT, 1);
-        curl_setopt($r, CURLOPT_URL, $destination);
+        curl_setopt($r, CURLOPT_URL, $webdav . $file_ref_id);
         curl_setopt($r, CURLOPT_HTTPHEADER, ($header));
         curl_setopt($r, CURLOPT_INFILE, $fh_res);
         curl_setopt($r, CURLOPT_INFILESIZE, filesize($data));        
@@ -84,7 +114,8 @@ class OwncloudFolder extends VirtualFolderType {
         curl_close($r);
         fclose($fh_res);
 
-        return ($status >= 200) && ($status < 300);
+        $plugin = PluginManager::getInstance()->getPluginById($this->plugin_id);
+        return $plugin->getPreparedFile($file_ref_id);
     }
 
     public function copyFile($file_ref_id)
@@ -107,7 +138,9 @@ class OwncloudFolder extends VirtualFolderType {
         curl_exec($r);
         $status = curl_getinfo($r, CURLINFO_HTTP_CODE);
         curl_close($r);
-        return ($status >= 200) && ($status < 300);
+        
+        $plugin = PluginManager::getInstance()->getPluginById($this->plugin_id);
+        return $plugin->getPreparedFile($file_ref_id);
     }
 
     public function moveFile($file_ref_id)
@@ -130,7 +163,9 @@ class OwncloudFolder extends VirtualFolderType {
         curl_exec($r);
         $status = curl_getinfo($r, CURLINFO_HTTP_CODE);
         curl_close($r);
-        return ($status >= 200) && ($status < 300);
+        
+        $plugin = PluginManager::getInstance()->getPluginById($this->plugin_id);
+        return $plugin->getPreparedFile($file_ref_id);
     }
 
     public function editFile($file_ref_id, $name = null, $description = null,  $content_terms_of_use_id = null)
@@ -155,8 +190,9 @@ class OwncloudFolder extends VirtualFolderType {
         curl_exec($r);
         $status = curl_getinfo($r, CURLINFO_HTTP_CODE);
         curl_close($r);
-
-        return ($status >= 200) && ($status < 300);
+        
+        $plugin = PluginManager::getInstance()->getPluginById($this->plugin_id);
+        return $plugin->getPreparedFile($file_ref_id);
     }
 
     public function createSubfolder(FolderType $foldertype)

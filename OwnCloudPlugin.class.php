@@ -99,6 +99,8 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
         $file->download_url = $info->download_url;
         $file->mkdate       = $info->chdate;
         $file->chdate       = $info->chdate;
+        $file->content_terms_of_use_id = 'UNDEF_LICENSE';
+        
         if ($with_blob) {
             $parts = parse_url(UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_ENDPOINT);
             $url = $parts['scheme']
