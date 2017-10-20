@@ -170,4 +170,54 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
         return UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_ACTIVATED;
     }
 
+    protected function getType($id)
+    {
+        $parts = parse_url(UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_ENDPOINT);
+        $url = $parts['scheme']
+            ."://"
+            .$parts['host']
+            .($parts['port'] ? ":".$parts['port'] : "")
+            .($parts['path'] ?: "");
+        if ($url[strlen($url) - 1] !== "/") {
+            $url .= "/";
+        }
+        $webdav = $url . "remote.php/webdav/";
+        $root = "remote.php/webdav/".$this->id;
+        $header = array();
+        $header[] = "Authorization: Bearer ".\Owncloud\OAuth::getAccessToken();
+        $r = curl_init();
+        curl_setopt($r, CURLOPT_CUSTOMREQUEST, "PROPFIND");
+        curl_setopt($r, CURLOPT_URL, $webdav."/".$id);
+        curl_setopt($r, CURLOPT_HTTPHEADER, ($header));
+        curl_setopt($r, CURLOPT_RETURNTRANSFER, 1);
+        $xml = curl_exec($r);
+        curl_close($r);
+        $doc = new DOMDocument();
+        $doc->loadXML($xml);
+        
+        foreach ($doc->getElementsByTagNameNS("DAV:","response") as $file) {
+            foreach ($file->childNodes as $node) {
+                if ($node->tagName === "d:propstat") {
+                    foreach ($node->childNodes as $prop) {
+                        foreach ($prop->childNodes as $attr) {
+                            if ($attr->tagName === "d:resourcetype") {
+                                $file_attributes['type'] = $attr->childNodes[0] && $attr->childNodes[0]->tagName === "d:collection" ? "folder" : "file";
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return $file_attributes['type'];
+    }
+
+    public function isFolder($id)
+    {
+       return $this->getType($id) == 'folder';
+    }
+
+    public function isFile($id)
+    {
+        return $this->getType($id) == 'file';
+    }
 }
