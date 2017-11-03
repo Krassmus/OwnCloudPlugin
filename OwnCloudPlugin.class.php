@@ -2,7 +2,6 @@
 
 require_once __DIR__."/classes/OAuth.class.php";
 require_once __DIR__."/classes/OwncloudFolder.class.php";
-include __DIR__.'/vendor/autoload.php';
 
 class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
 
