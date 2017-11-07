@@ -123,11 +123,11 @@ class OwncloudFolder extends VirtualFolderType {
         $webdav = $this->getWebDavURL();
         
         $tmp_parts = explode('/', $file_ref_id);
-        $destination = $webdav . $this->id . (mb_strlen($this->id)?'/':'') . end($tmp_parts);
+        $destination = $this->id . (mb_strlen($this->id)?'/':'') . end($tmp_parts);
 
         $header = array();
         $header[] = "Authorization: Bearer ".\Owncloud\OAuth::getAccessToken();
-        $header[] = "Destination: ".$destination;
+        $header[] = "Destination: ". $webdav . $destination;
 
         $r = curl_init();
         curl_setopt($r, CURLOPT_CUSTOMREQUEST, "COPY");
@@ -140,7 +140,7 @@ class OwncloudFolder extends VirtualFolderType {
         curl_close($r);
         
         $plugin = PluginManager::getInstance()->getPluginById($this->plugin_id);
-        return $plugin->getPreparedFile($file_ref_id);
+        return $plugin->getPreparedFile($destination);
     }
 
     public function moveFile($file_ref_id)
@@ -148,11 +148,11 @@ class OwncloudFolder extends VirtualFolderType {
         $webdav = $this->getWebDavURL();
 
         $tmp_parts = explode('/', $file_ref_id);
-        $destination = $webdav . $this->id . (mb_strlen($this->id)?'/':'') . end($tmp_parts);
+        $destination = $this->id . (mb_strlen($this->id)?'/':'') . end($tmp_parts);
 
         $header = array();
         $header[] = "Authorization: Bearer ".\Owncloud\OAuth::getAccessToken();
-        $header[] = "Destination: ".$destination;
+        $header[] = "Destination: ". $webdav . $destination;
 
         $r = curl_init();
         curl_setopt($r, CURLOPT_CUSTOMREQUEST, "MOVE");
@@ -165,7 +165,7 @@ class OwncloudFolder extends VirtualFolderType {
         curl_close($r);
         
         $plugin = PluginManager::getInstance()->getPluginById($this->plugin_id);
-        return $plugin->getPreparedFile($file_ref_id);
+        return $plugin->getPreparedFile($destination);
     }
 
     public function editFile($file_ref_id, $name = null, $description = null,  $content_terms_of_use_id = null)
@@ -175,11 +175,11 @@ class OwncloudFolder extends VirtualFolderType {
         }      
         
         $webdav = $this->getWebDavURL();        
-        $destination = $webdav . $this->id . (mb_strlen($this->id)?'/':'') . $name;
+        $destination = $this->id . (mb_strlen($this->id)?'/':'') . $name;
 
         $header = array();
         $header[] = "Authorization: Bearer ".\Owncloud\OAuth::getAccessToken();
-        $header[] = "Destination: ".$destination;
+        $header[] = "Destination: ". $webdav . $destination;
 
         $r = curl_init();
         curl_setopt($r, CURLOPT_CUSTOMREQUEST, "MOVE");
@@ -192,19 +192,23 @@ class OwncloudFolder extends VirtualFolderType {
         curl_close($r);
         
         $plugin = PluginManager::getInstance()->getPluginById($this->plugin_id);
-        return $plugin->getPreparedFile($file_ref_id);
+        return $plugin->getPreparedFile($destination);
     }
 
     public function createSubfolder(FolderType $foldertype)
     {
         $webdav = $this->getWebDavURL();
+
+        $tmp_parts = explode('/', $foldertype->getId());
+        $destination = $this->id . (mb_strlen($this->id)?'/':'') . end($tmp_parts);
+
         $header = array();
         $header[] = "Authorization: Bearer ".\Owncloud\OAuth::getAccessToken();
 
         $r = curl_init();
 
         curl_setopt($r, CURLOPT_CUSTOMREQUEST, "MKCOL");
-        curl_setopt($r, CURLOPT_URL, $webdav . $foldertype->getId());
+        curl_setopt($r, CURLOPT_URL, $webdav . $destination);
         curl_setopt($r, CURLOPT_HTTPHEADER, ($header));
         curl_setopt($r, CURLOPT_RETURNTRANSFER, 1);
 
@@ -212,7 +216,8 @@ class OwncloudFolder extends VirtualFolderType {
         $status = curl_getinfo($r, CURLINFO_HTTP_CODE);
         curl_close($r);
 
-        return (($status >= 200) && ($status < 300)) ? $foldertype : false;
+        $plugin = PluginManager::getInstance()->getPluginById($this->plugin_id);
+        return (($status >= 200) && ($status < 300)) ? $plugin->getFolder($destination) : false;
     }
 
     protected function getWebDavURL()

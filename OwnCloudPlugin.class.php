@@ -14,6 +14,10 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
 
     public function getFolder($folder_id = null)
     {
+        if($folder_id && !$this->isFolder($folder_id)){
+            return null;
+        }
+
         $folder_path = explode("/", $folder_id);
         $name = array_pop($folder_path);
         $parent_folder_id = implode("/", $folder_path);
@@ -68,6 +72,10 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
 
     public function getPreparedFile($file_id, $with_blob = false)
     {
+        if(!$this->isFile($file_id)) {
+            return null;
+        }
+        
         $folder_path = explode("/", $file_id);
         $filename = array_pop($folder_path);
         $folder_id = implode("/", $folder_path);
@@ -200,7 +208,7 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
                     foreach ($node->childNodes as $prop) {
                         foreach ($prop->childNodes as $attr) {
                             if ($attr->tagName === "d:resourcetype") {
-                                $file_attributes['type'] = $attr->childNodes[0] && $attr->childNodes[0]->tagName === "d:collection" ? "folder" : "file";
+                                return /*$file_attributes['type'] =*/ ($attr->childNodes[0] && $attr->childNodes[0]->tagName === "d:collection") ? "folder" : "file";                                                            
                             }
                         }
                     }
@@ -210,12 +218,12 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
         return $file_attributes['type'];
     }
 
-    public function isFolder($id)
+    protected function isFolder($id)
     {
        return $this->getType($id) == 'folder';
     }
 
-    public function isFile($id)
+    protected function isFile($id)
     {
         return $this->getType($id) == 'file';
     }
