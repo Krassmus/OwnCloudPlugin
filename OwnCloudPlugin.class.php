@@ -34,7 +34,7 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
     public function download_action()
     {
         $args = func_get_args();
-        $file_id = implode("/", $args);
+        $file_id = implode("/", array_map("rawurlencode", $args));
 
         $parts = parse_url(UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_ENDPOINT);
         $url = $parts['scheme']
@@ -56,7 +56,7 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
 
         $r = curl_init();
         curl_setopt($r, CURLOPT_CUSTOMREQUEST, "GET");
-        curl_setopt($r, CURLOPT_URL, $webdav."/".$file_id);
+        curl_setopt($r, CURLOPT_URL, $webdav . $file_id);
         curl_setopt($r, CURLOPT_HTTPHEADER, ($header));
         curl_setopt($r, CURLOPT_RETURNTRANSFER, 1);
 
@@ -70,6 +70,11 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
         return;
     }
 
+    /**
+     * @param $file_id : this is a path to the file. Remind that the chunks of this path need to be rawurlencoded!
+     * @param bool $with_blob : should OwnCloudPlugin retrieve the blib of the file as well?
+     * @return FileRef|null : Returns the FileRef on success and null if the file doesn't exist.
+     */
     public function getPreparedFile($file_id, $with_blob = false)
     {
         if(!$this->isFile($file_id)) {
@@ -77,7 +82,7 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
         }
         
         $folder_path = explode("/", $file_id);
-        $filename = array_pop($folder_path);
+        $filename = rawurldecode(array_pop($folder_path));
         $folder_id = implode("/", $folder_path);
         $name = array_pop($folder_path);
         $parent_folder_id = implode("/", $folder_path);
@@ -129,7 +134,7 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
 
             $r = curl_init();
             curl_setopt($r, CURLOPT_CUSTOMREQUEST, "GET");
-            curl_setopt($r, CURLOPT_URL, $webdav."/".$file_id);
+            curl_setopt($r, CURLOPT_URL, $webdav.$file_id);
             curl_setopt($r, CURLOPT_HTTPHEADER, ($header));
             curl_setopt($r, CURLOPT_RETURNTRANSFER, 1);
 

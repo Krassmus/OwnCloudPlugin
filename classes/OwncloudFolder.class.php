@@ -94,7 +94,7 @@ class OwncloudFolder extends VirtualFolderType {
     {       
         $webdav = $this->getWebDavURL();
 
-        $file_ref_id = $this->id . (mb_strlen($this->id)?'/':'') .  $filedata['name'];
+        $file_ref_id = $this->id . (mb_strlen($this->id) ? '/' : '') . rawurlencode($filedata['name']);
 
         $header = array();
         $header[] = "Authorization: Bearer ".\Owncloud\OAuth::getAccessToken();
@@ -123,7 +123,7 @@ class OwncloudFolder extends VirtualFolderType {
         $webdav = $this->getWebDavURL();
         
         $tmp_parts = explode('/', $file_ref_id);
-        $destination = $this->id . (mb_strlen($this->id)?'/':'') . end($tmp_parts);
+        $destination = $this->id . (mb_strlen($this->id) ? '/' : '') . end($tmp_parts);
 
         $header = array();
         $header[] = "Authorization: Bearer ".\Owncloud\OAuth::getAccessToken();
@@ -170,12 +170,12 @@ class OwncloudFolder extends VirtualFolderType {
 
     public function editFile($file_ref_id, $name = null, $description = null,  $content_terms_of_use_id = null)
     {
-        if(!$name) {
+        if (!$name) {
             return false;
-        }      
+        }
         
         $webdav = $this->getWebDavURL();        
-        $destination = $this->id . (mb_strlen($this->id)?'/':'') . $name;
+        $destination = $this->id . (mb_strlen($this->id)?'/':'') . rawurlencode($name);
 
         $header = array();
         $header[] = "Authorization: Bearer ".\Owncloud\OAuth::getAccessToken();
@@ -249,7 +249,7 @@ class OwncloudFolder extends VirtualFolderType {
 
         $r = curl_init();
         curl_setopt($r, CURLOPT_CUSTOMREQUEST, "PROPFIND");
-        curl_setopt($r, CURLOPT_URL, $webdav."/".$this->id);
+        curl_setopt($r, CURLOPT_URL, $webdav . $this->id);
         curl_setopt($r, CURLOPT_HTTPHEADER, ($header));
         curl_setopt($r, CURLOPT_RETURNTRANSFER, 1);
 
@@ -300,7 +300,7 @@ class OwncloudFolder extends VirtualFolderType {
             }
             if ($file_attributes['type'] === "folder") {
                 $this->subfolders[] = new OwncloudFolder(array(
-                    'id' => ($this->id ? $this->id."/" : "").$file_attributes['name'],
+                    'id' => ($this->id ? $this->id."/" : "") . rawurlencode($file_attributes['name']),
                     'name' => $file_attributes['name'],
                     'parent_id' => $this->id,
                     'range_type' => $this->plugin_id,
@@ -308,7 +308,7 @@ class OwncloudFolder extends VirtualFolderType {
                 ), $this->plugin_id);
             } else {
                 $this->files[] = (object) array(
-                    'id' => ($this->id ? $this->id."/" : "").$file_attributes['name'],
+                    'id' => ($this->id ? $this->id."/" : "") . rawurlencode($file_attributes['name']),
                     'name' => $file_attributes['name'],
                     'size' => $file_attributes['size'],
                     'mime_type' => $file_attributes['contenttype'],
