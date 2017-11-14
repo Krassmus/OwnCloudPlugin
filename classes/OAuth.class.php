@@ -114,7 +114,9 @@ class OAuth {
         } elseif ($json['error']) {
             \PageLayout::postError(_("Authentifizierungsfehler:")." ".$json['error']);
         } else {
-            \PageLayout::postInfo("Access-Token wurde erfolgreich erneuert.");
+            if (\Studip\ENV === "development") {
+                \PageLayout::postInfo("Access-Token wurde erfolgreich erneuert.");
+            }
             $config = \UserConfig::get($GLOBALS['user']->id);
             $config->store("OWNCLOUD_ACCESS_TOKEN", $json['access_token']);
             //$config->store("OWNCLOUD_REFRESH_TOKEN", $json['refresh_token']);

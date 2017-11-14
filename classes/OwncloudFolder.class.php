@@ -42,7 +42,7 @@ class OwncloudFolder extends VirtualFolderType {
 
     public function store()
     {        
-        $old_id = $this->parent_id . '/' . $this->name;
+        $old_id = $this->parent_id . '/' . rawurlencode($this->name);
 
         if ($this->getId() != $old_id) {
 
