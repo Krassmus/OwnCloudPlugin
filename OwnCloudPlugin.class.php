@@ -19,7 +19,7 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
         }
 
         $folder_path = explode("/", $folder_id);
-        $name = array_pop($folder_path);
+        $name = rawurldecode(array_pop($folder_path));
         $parent_folder_id = implode("/", $folder_path);
         $folder = new OwncloudFolder(array(
             'id' => $folder_id,
