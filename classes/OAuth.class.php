@@ -119,7 +119,9 @@ class OAuth {
             }
             $config = \UserConfig::get($GLOBALS['user']->id);
             $config->store("OWNCLOUD_ACCESS_TOKEN", $json['access_token']);
-            //$config->store("OWNCLOUD_REFRESH_TOKEN", $json['refresh_token']);
+            if ($json['refresh_token']) {
+                $config->store("OWNCLOUD_REFRESH_TOKEN", $json['refresh_token']);
+            }
             $config->store("OWNCLOUD_ACCESS_TOKEN_EXPIRES", time() + $json['expires_in']);
         }
     }
