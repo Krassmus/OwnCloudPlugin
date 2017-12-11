@@ -14,7 +14,7 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
 
     public function getFolder($folder_id = null)
     {
-        if($folder_id && !$this->isFolder($folder_id)){
+        if ($folder_id && !$this->isFolder($folder_id)) {
             return null;
         }
 
@@ -36,15 +36,7 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
         $args = func_get_args();
         $file_id = implode("/", array_map("rawurlencode", $args));
 
-        $parts = parse_url(UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_ENDPOINT);
-        $url = $parts['scheme']
-            .urlencode(UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_USERNAME)
-            .":"
-            .urlencode(UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_PASSWORD)
-            ."@"
-            .$parts['host']
-            .($parts['port'] ? ":".$parts['port'] : "")
-            .($parts['path'] ?: "");
+        $url = Config::get()->OWNCLOUD_ENDPOINT ?: UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_ENDPOINT;
         if ($url[strlen($url) - 1] !== "/") {
             $url .= "/";
         }
@@ -77,7 +69,7 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
      */
     public function getPreparedFile($file_id, $with_blob = false)
     {
-        if(!$this->isFile($file_id)) {
+        if (!$this->isFile($file_id)) {
             return null;
         }
         
@@ -184,17 +176,11 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
 
     protected function getType($id)
     {
-        $parts = parse_url(UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_ENDPOINT);
-        $url = $parts['scheme']
-            ."://"
-            .$parts['host']
-            .($parts['port'] ? ":".$parts['port'] : "")
-            .($parts['path'] ?: "");
+        $url = Config::get()->OWNCLOUD_ENDPOINT ?: UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_ENDPOINT;
         if ($url[strlen($url) - 1] !== "/") {
             $url .= "/";
         }
         $webdav = $url . "remote.php/webdav/";
-        $root = "remote.php/webdav/".$this->id;
         $header = array();
         $header[] = "Authorization: Bearer ".\Owncloud\OAuth::getAccessToken();
         $r = curl_init();
@@ -209,11 +195,11 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
         
         foreach ($doc->getElementsByTagNameNS("DAV:","response") as $file) {
             foreach ($file->childNodes as $node) {
-                if ($node->tagName === "d:propstat") {
+                if (strtolower($node->tagName) === "d:propstat") {
                     foreach ($node->childNodes as $prop) {
                         foreach ($prop->childNodes as $attr) {
-                            if ($attr->tagName === "d:resourcetype") {
-                                return /*$file_attributes['type'] =*/ ($attr->childNodes[0] && $attr->childNodes[0]->tagName === "d:collection") ? "folder" : "file";                                                            
+                            if (strtolower($attr->tagName) === "d:resourcetype") {
+                                return $file_attributes['type'] = ($attr->childNodes[0] && strtolower($attr->childNodes[0]->tagName) === "d:collection") ? "folder" : "file";
                             }
                         }
                     }

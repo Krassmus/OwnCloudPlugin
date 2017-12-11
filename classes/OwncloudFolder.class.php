@@ -246,6 +246,7 @@ class OwncloudFolder extends VirtualFolderType {
 
         $header = array();
         $header[] = "Authorization: Bearer ".\Owncloud\OAuth::getAccessToken();
+        $header[] = "Depth: 1";
 
         $r = curl_init();
         curl_setopt($r, CURLOPT_CUSTOMREQUEST, "PROPFIND");
