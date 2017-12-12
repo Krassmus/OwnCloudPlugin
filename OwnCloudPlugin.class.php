@@ -196,10 +196,16 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
         foreach ($doc->getElementsByTagNameNS("DAV:","response") as $file) {
             foreach ($file->childNodes as $node) {
                 if (strtolower($node->tagName) === "d:propstat") {
-                    foreach ($node->childNodes as $prop) {
-                        foreach ($prop->childNodes as $attr) {
-                            if (strtolower($attr->tagName) === "d:resourcetype") {
-                                return $file_attributes['type'] = ($attr->childNodes[0] && strtolower($attr->childNodes[0]->tagName) === "d:collection") ? "folder" : "file";
+                    if ($node->childNodes) {
+                        foreach ($node->childNodes as $prop) {
+                            if ($prop->childNodes) {
+                                foreach ($prop->childNodes as $attr) {
+                                    if (strtolower($attr->tagName) === "d:resourcetype") {
+                                        return $file_attributes['type'] = ($attr->childNodes[0] && strtolower($attr->childNodes[0]->tagName) === "d:collection")
+                                            ? "folder"
+                                            : "file";
+                                    }
+                                }
                             }
                         }
                     }
