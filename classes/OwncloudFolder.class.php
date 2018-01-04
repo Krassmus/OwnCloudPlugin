@@ -199,8 +199,13 @@ class OwncloudFolder extends VirtualFolderType {
     {
         $webdav = $this->getWebDavURL();
 
-        $tmp_parts = explode('/', $foldertype->getId());
-        $destination = $this->id . (mb_strlen($this->id)?'/':'') . end($tmp_parts);
+        if ($foldertype->getId()) {
+            $name = explode('/', $foldertype->getId());
+            $name = end($name);
+        } else {
+            $name = rawurlencode($foldertype->name);
+        }
+        $destination = $this->id . (mb_strlen($this->id)?'/':'') . $name;
 
         $header = array();
         $header[] = "Authorization: Bearer ".\Owncloud\OAuth::getAccessToken();
