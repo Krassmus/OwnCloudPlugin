@@ -227,12 +227,7 @@ class OwncloudFolder extends VirtualFolderType {
 
     protected function getWebDavURL()
     {
-        $parts = parse_url(UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_ENDPOINT);
-        $url = $parts['scheme']
-            ."://"
-            .$parts['host']
-            .($parts['port'] ? ":".$parts['port'] : "")
-            .($parts['path'] ?: "");
+        $url = Config::get()->OWNCLOUD_ENDPOINT ?: UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_ENDPOINT;
         if ($url[strlen($url) - 1] !== "/") {
             $url .= "/";
         }
@@ -262,6 +257,14 @@ class OwncloudFolder extends VirtualFolderType {
         $xml = curl_exec($r);
         curl_close($r);
 
+        if (!$xml) {
+            PageLayout::postError(_("Konnte keine Daten von OwnCloud bekommen."));
+            $this->subfolders = array();
+            $this->files = array();
+            $this->did_propfind = true;
+            return;
+        }
+
         $doc = new DOMDocument();
         $doc->loadXML($xml);
 
@@ -278,51 +281,62 @@ class OwncloudFolder extends VirtualFolderType {
             $file_attributes = array();
 
             foreach ($file->childNodes as $node) {
-                if ($node->tagName === "d:href") {
-                    $file_attributes['name'] = substr($node->nodeValue, strpos($node->nodeValue, $root) + strlen($root));
-                    $file_attributes['name'] = urldecode(array_pop(preg_split("/\//", $file_attributes['name'], 0, PREG_SPLIT_NO_EMPTY)));
-                    if (!$file_attributes['name']) {
+                if (strtolower($node->tagName) === "d:href") {
+                    $path = substr($node->nodeValue, strpos(strtolower($node->nodeValue), strtolower($root)) + strlen($root));
+                    $path_array = preg_split("/\//", $path, 0, PREG_SPLIT_NO_EMPTY);
+                    $file_attributes['name'] = rawurldecode(array_pop($path_array));
+                    if (!trim($file_attributes['name']) || $path === $this->id) {
                         continue 2;
                     }
                 }
-                if ($node->tagName === "d:propstat") {
+                if (strtolower($node->tagName) === "d:propstat") {
                     foreach ($node->childNodes as $prop) {
-                        foreach ($prop->childNodes as $attr) {
-                            if ($attr->tagName === "d:resourcetype") {
-                                $file_attributes['type'] = $attr->childNodes[0] && $attr->childNodes[0]->tagName === "d:collection" ? "folder" : "file";
-                            }
-                            if ($attr->tagName === "d:getcontentlength") {
-                                $file_attributes['size'] = $attr->nodeValue;
-                            }
-                            if ($attr->tagName === "d:getcontenttype") {
-                                $file_attributes['contenttype'] = $attr->nodeValue;
-                            }
-                            if ($attr->tagName === "d:getlastmodified") {
-                                $file_attributes['chdate'] = strtotime($attr->nodeValue);
+                        if ($prop->childNodes) {
+                            foreach ($prop->childNodes as $attr) {
+                                if (strtolower($attr->tagName) === "d:resourcetype") {
+                                    $file_attributes['type'] = $attr->childNodes[0] && strtolower($attr->childNodes[0]->tagName) === "d:collection" ? "folder" : "file";
+                                }
+                                if (strtolower($attr->tagName) === "d:getcontentlength") {
+                                    $file_attributes['size'] = $attr->nodeValue;
+                                }
+                                if (strtolower($attr->tagName) === "d:getcontenttype") {
+                                    $file_attributes['contenttype'] = $attr->nodeValue;
+                                }
+                                if (strtolower($attr->tagName) === "d:creationdate") {
+                                    $file_attributes['chdate'] = strtotime($attr->nodeValue);
+                                }
+                                if (strtolower($attr->tagName) === "d:displayname") {
+                                    $file_attributes['name'] = $attr->nodeValue;
+                                }
+                                if ($attr->tagName === "d:getlastmodified") {
+                                    $file_attributes['chdate'] = strtotime($attr->nodeValue);
+                                }
                             }
                         }
                     }
                 }
             }
-            if ($file_attributes['type'] === "folder") {
-                $this->subfolders[] = new OwncloudFolder(array(
-                    'id' => ($this->id ? $this->id."/" : "") . rawurlencode($file_attributes['name']),
-                    'name' => $file_attributes['name'],
-                    'parent_id' => $this->id,
-                    'range_type' => $this->plugin_id,
-                    'range_id' => 'OwnCloudPlugin'
-                ), $this->plugin_id);
-            } else {
-                $content_type = $file_attributes['contenttype'] ?: get_mime_type($file_attributes['name']);
-                $this->files[] = (object) array(
-                    'id' => ($this->id ? $this->id."/" : "") . rawurlencode($file_attributes['name']),
-                    'name' => $file_attributes['name'],
-                    'size' => $file_attributes['size'],
-                    'mime_type' => $content_type,
-                    'description' => "",
-                    'chdate' => $file_attributes['chdate'],
-                    'download_url' => URLHelper::getURL( "plugins.php/owncloudplugin/download/".($this->id ? $this->id."/" : "").$file_attributes['name'])
-                );
+            if (trim($file_attributes['name'])) {
+                if ($file_attributes['type'] === "folder") {
+                    $this->subfolders[] = new OwncloudFolder(array(
+                        'id' => ($this->id ? $this->id . "/" : "") . rawurlencode($file_attributes['name']),
+                        'name' => $file_attributes['name'],
+                        'parent_id' => $this->id,
+                        'range_type' => $this->plugin_id,
+                        'range_id' => 'OwnCloudPlugin'
+                    ), $this->plugin_id);
+                } else {
+                    $content_type = $file_attributes['contenttype'] ?: get_mime_type($file_attributes['name']);
+                    $this->files[] = (object) array(
+                        'id' => ($this->id ? $this->id . "/" : "") . rawurlencode($file_attributes['name']),
+                        'name' => $file_attributes['name'],
+                        'size' => $file_attributes['size'],
+                        'mime_type' => $content_type,
+                        'description' => "",
+                        'chdate' => $file_attributes['chdate'],
+                        'download_url' => URLHelper::getURL("plugins.php/owncloudplugin/download/" . ($this->id ? $this->id . "/" : "") . $file_attributes['name'])
+                    );
+                }
             }
         }
         $this->did_propfind = true;

@@ -106,15 +106,7 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
         $file->content_terms_of_use_id = 'UNDEF_LICENSE';
         
         if ($with_blob) {
-            $parts = parse_url(UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_ENDPOINT);
-            $url = $parts['scheme']
-                .urlencode(UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_USERNAME)
-                .":"
-                .urlencode(UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_PASSWORD)
-                ."@"
-                .$parts['host']
-                .($parts['port'] ? ":".$parts['port'] : "")
-                .($parts['path'] ?: "");
+            $url = Config::get()->OWNCLOUD_ENDPOINT ?: UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_ENDPOINT;
             if ($url[strlen($url) - 1] !== "/") {
                 $url .= "/";
             }
