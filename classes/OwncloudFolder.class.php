@@ -98,8 +98,8 @@ class OwncloudFolder extends VirtualFolderType {
 
         $header = array();
         $header[] = "Authorization: Bearer ".\Owncloud\OAuth::getAccessToken();
-       
-        $data = $filedata['tmp_name'];
+
+        $data = is_a($filedata, "File") ? $filedata->getPath() : $filedata['tmp_name'];
         $fh_res = fopen($data, 'r');
 
         $r = curl_init();
