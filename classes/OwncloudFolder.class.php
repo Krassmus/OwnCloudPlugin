@@ -99,7 +99,24 @@ class OwncloudFolder extends VirtualFolderType {
         $header = array();
         $header[] = "Authorization: Bearer ".\Owncloud\OAuth::getAccessToken();
 
-        $data = is_a($filedata, "File") ? $filedata->getPath() : $filedata['tmp_name'];
+        $url_template = "[InternetShortcut]\nURL=%s";
+        if (is_a($filedata, "File")) {
+            if ($filedata->getURL()) {
+                $data = $GLOBALS['TMP_PATH']."/file_".md5(uniqid());
+                file_put_contents($data, sprintf($url_template, $filedata->getURL()));
+                $file_ref_id .= ".url";
+            } else {
+                $data = $filedata->getPath();
+            }
+        } else {
+            if ($filedata['url']) {
+                $data = $GLOBALS['TMP_PATH']."/file_".md5(uniqid());
+                file_put_contents($data, sprintf($url_template, $filedata['url']));
+                $file_ref_id .= ".url";
+            } else {
+                $data = $filedata['tmp_name'];
+            }
+        }
         $fh_res = fopen($data, 'r');
 
         $r = curl_init();
