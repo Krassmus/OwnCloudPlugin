@@ -94,6 +94,20 @@ class OwncloudFolder extends VirtualFolderType {
     {       
         $webdav = $this->getWebDavURL();
 
+        if ($this->fileExists($filedata['name'])) {
+            if (strpos($filedata['name'], ".")) {
+                $end = substr($filedata['name'], strpos($filedata['name'], "."));
+                $name_raw = substr($filedata['name'], 0, strpos($filedata['name'], "."));
+            } else {
+                $name_raw = $filedata['name'];
+            }
+            $i = 0;
+            do {
+                $i++;
+                $new_name = $name_raw."(".$i.").".$end;
+            } while ($this->fileExists($new_name));
+            $filedata['name'] = $new_name;
+        }
         $file_ref_id = $this->id . (mb_strlen($this->id) ? '/' : '') . rawurlencode($filedata['name']);
 
         $header = array();
@@ -140,7 +154,24 @@ class OwncloudFolder extends VirtualFolderType {
         $webdav = $this->getWebDavURL();
         
         $tmp_parts = explode('/', $file_ref_id);
-        $destination = $this->id . (mb_strlen($this->id) ? '/' : '') . end($tmp_parts);
+
+        $name = end($tmp_parts);
+        if ($this->fileExists($name)) {
+            if (strpos($name, ".")) {
+                $end = substr($name, strpos($name, "."));
+                $name_raw = substr($name, 0, strpos($name, "."));
+            } else {
+                $name_raw = $name;
+            }
+            $i = 0;
+            do {
+                $i++;
+                $new_name = $name_raw."(".$i.").".$end;
+            } while ($this->fileExists($new_name));
+            $name = $new_name;
+        }
+
+        $destination = $this->id . (mb_strlen($this->id) ? '/' : '') . rawurlencode($name);
 
         $header = array();
         $header[] = "Authorization: Bearer ".\Owncloud\OAuth::getAccessToken();
@@ -165,7 +196,23 @@ class OwncloudFolder extends VirtualFolderType {
         $webdav = $this->getWebDavURL();
 
         $tmp_parts = explode('/', $file_ref_id);
-        $destination = $this->id . (mb_strlen($this->id)?'/':'') . end($tmp_parts);
+
+        $name = end($tmp_parts);
+        if ($this->fileExists($name)) {
+            if (strpos($name, ".")) {
+                $end = substr($name, strpos($name, "."));
+                $name_raw = substr($name, 0, strpos($name, "."));
+            } else {
+                $name_raw = $name;
+            }
+            $i = 0;
+            do {
+                $i++;
+                $new_name = $name_raw."(".$i.").".$end;
+            } while ($this->fileExists($new_name));
+            $name = $new_name;
+        }
+        $destination = $this->id . (mb_strlen($this->id)?'/':'') . rawurlencode($name);
 
         $header = array();
         $header[] = "Authorization: Bearer ".\Owncloud\OAuth::getAccessToken();
@@ -191,7 +238,21 @@ class OwncloudFolder extends VirtualFolderType {
             return false;
         }
         
-        $webdav = $this->getWebDavURL();        
+        $webdav = $this->getWebDavURL();
+        if ($this->fileExists(rawurlencode($name))) {
+            if (strpos($name, ".")) {
+                $end = substr($name, strpos($name, "."));
+                $name_raw = substr($name, 0, strpos($name, "."));
+            } else {
+                $name_raw = $name;
+            }
+            $i = 0;
+            do {
+                $i++;
+                $new_name = $name_raw."(".$i.").".$end;
+            } while ($this->fileExists(rawurlencode($new_name)));
+            $name = $new_name;
+        }
         $destination = $this->id . (mb_strlen($this->id)?'/':'') . rawurlencode($name);
 
         $header = array();
@@ -221,6 +282,15 @@ class OwncloudFolder extends VirtualFolderType {
             $name = end($name);
         } else {
             $name = rawurlencode($foldertype->name);
+        }
+        if ($this->folderExists($name)) {
+            $name_raw = $name;
+            $i = 0;
+            do {
+                $i++;
+                $new_name = $name_raw."(".$i.")";
+            } while ($this->folderExists($new_name));
+            $name = $new_name;
         }
         $destination = $this->id . (mb_strlen($this->id)?'/':'') . $name;
 
@@ -399,6 +469,26 @@ class OwncloudFolder extends VirtualFolderType {
         }
         $plugin = PluginEngine::getPlugin('OwnCloudPlugin');
         return $plugin->getFolder($this->parent_id);
+    }
+
+    public function fileExists($name)
+    {
+        foreach ($this->getFiles() as $file) {
+            if ($file->name === $name) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function folderExists($name)
+    {
+        foreach ($this->getSubfolders() as $folder) {
+            if ($folder->name === $name) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }
