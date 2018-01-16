@@ -17,6 +17,9 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
         if ($folder_id && !$this->isFolder($folder_id)) {
             return null;
         }
+        if ($folder_id[0] === "/") {
+            $folder_id = substr($folder_id, 1);
+        }
 
         $folder_path = explode("/", $folder_id);
         $name = rawurldecode(array_pop($folder_path));
