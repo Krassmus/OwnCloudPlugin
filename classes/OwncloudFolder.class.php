@@ -145,7 +145,7 @@ class OwncloudFolder extends VirtualFolderType {
         curl_close($r);
         fclose($fh_res);
 
-        $plugin = PluginManager::getInstance()->getPluginById($this->plugin_id);
+        $plugin = PluginManager::getInstance()->getPlugin("OwnCloudPlugin");
         return $plugin->getPreparedFile($file_ref_id);
     }
 
@@ -186,8 +186,8 @@ class OwncloudFolder extends VirtualFolderType {
         curl_exec($r);
         $status = curl_getinfo($r, CURLINFO_HTTP_CODE);
         curl_close($r);
-        
-        $plugin = PluginManager::getInstance()->getPluginById($this->plugin_id);
+
+        $plugin = PluginManager::getInstance()->getPlugin("OwnCloudPlugin");
         return $plugin->getPreparedFile($destination);
     }
 
@@ -227,8 +227,8 @@ class OwncloudFolder extends VirtualFolderType {
         curl_exec($r);
         $status = curl_getinfo($r, CURLINFO_HTTP_CODE);
         curl_close($r);
-        
-        $plugin = PluginManager::getInstance()->getPluginById($this->plugin_id);
+
+        $plugin = PluginManager::getInstance()->getPlugin("OwnCloudPlugin");
         return $plugin->getPreparedFile($destination);
     }
 
@@ -269,7 +269,7 @@ class OwncloudFolder extends VirtualFolderType {
         $status = curl_getinfo($r, CURLINFO_HTTP_CODE);
         curl_close($r);
         
-        $plugin = PluginManager::getInstance()->getPluginById($this->plugin_id);
+        $plugin = PluginManager::getInstance()->getPlugin("OwnCloudPlugin");
         return $plugin->getPreparedFile($destination);
     }
 
@@ -308,7 +308,7 @@ class OwncloudFolder extends VirtualFolderType {
         $status = curl_getinfo($r, CURLINFO_HTTP_CODE);
         curl_close($r);
 
-        $plugin = PluginManager::getInstance()->getPluginById($this->plugin_id);
+        $plugin = PluginManager::getInstance()->getPlugin("OwnCloudPlugin");
         return (($status >= 200) && ($status < 300)) ? $plugin->getFolder($destination) : false;
     }
 

@@ -14,11 +14,11 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
 
     public function getFolder($folder_id = null)
     {
-        if ($folder_id && !$this->isFolder($folder_id)) {
-            return null;
-        }
         if ($folder_id[0] === "/") {
             $folder_id = substr($folder_id, 1);
+        }
+        if ($folder_id && !$this->isFolder($folder_id)) {
+            return null;
         }
 
         $folder_path = explode("/", $folder_id);
