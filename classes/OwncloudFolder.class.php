@@ -369,10 +369,17 @@ class OwncloudFolder extends VirtualFolderType {
 
             foreach ($file->childNodes as $node) {
                 if (strtolower($node->tagName) === "d:href") {
-                    $path = substr($node->nodeValue, strpos(strtolower($node->nodeValue), strtolower($root)) + strlen($root));
+                    $nodeValue = $node->nodeValue;
+                    if ($nodeValue[strlen($nodeValue) - 1] === "/") {
+                        $nodeValue = substr($nodeValue, 0, -1);
+                    }
+                    if ($nodeValue[0] === "/") {
+                        $nodeValue = substr($nodeValue, 1);
+                    }
+                    $path = substr($nodeValue, strpos(strtolower($nodeValue), strtolower(rawurldecode($root))) + strlen(rawurldecode($root)));
                     $path_array = preg_split("/\//", $path, 0, PREG_SPLIT_NO_EMPTY);
                     $file_attributes['name'] = rawurldecode(array_pop($path_array));
-                    if (!trim($file_attributes['name']) || $path === $this->id) {
+                    if (!trim($file_attributes['name']) || ($path === $this->id) || !$path) {
                         continue 2;
                     }
                 }
