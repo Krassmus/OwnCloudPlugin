@@ -376,7 +376,12 @@ class OwncloudFolder extends VirtualFolderType {
                     if ($nodeValue[0] === "/") {
                         $nodeValue = substr($nodeValue, 1);
                     }
-                    $path = substr($nodeValue, strpos(strtolower($nodeValue), strtolower(rawurldecode($root))) + strlen(rawurldecode($root)));
+                    $nodeValue = str_replace(array("(", ")"), array("%28", "%29"), $nodeValue); //for Owncloud only
+                    if (strpos(rawurldecode($nodeValue), rawurldecode($root)) !== false) {
+                        $path = substr($nodeValue, strpos(rawurldecode($nodeValue), rawurldecode($root)) + strlen($root));
+                    } else {
+                        $path = null;
+                    }
                     $path_array = preg_split("/\//", $path, 0, PREG_SPLIT_NO_EMPTY);
                     $file_attributes['name'] = rawurldecode(array_pop($path_array));
                     if (!trim($file_attributes['name']) || ($path === $this->id) || !$path) {
@@ -402,7 +407,7 @@ class OwncloudFolder extends VirtualFolderType {
                                 if (strtolower($attr->tagName) === "d:displayname") {
                                     $file_attributes['name'] = $attr->nodeValue;
                                 }
-                                if ($attr->tagName === "d:getlastmodified") {
+                                if (strtolower($attr->tagName) === "d:getlastmodified") {
                                     $file_attributes['chdate'] = strtotime($attr->nodeValue);
                                 }
                             }

@@ -187,7 +187,7 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
         curl_close($r);
         $doc = new DOMDocument();
         $doc->loadXML($xml);
-        
+
         foreach ($doc->getElementsByTagNameNS("DAV:","response") as $file) {
             foreach ($file->childNodes as $node) {
                 if (strtolower($node->tagName) === "d:propstat") {
