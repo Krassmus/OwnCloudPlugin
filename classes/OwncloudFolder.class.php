@@ -376,7 +376,7 @@ class OwncloudFolder extends VirtualFolderType {
                     if ($nodeValue[0] === "/") {
                         $nodeValue = substr($nodeValue, 1);
                     }
-                    $nodeValue = str_replace(array("(", ")"), array("%28", "%29"), $nodeValue); //for Owncloud only
+                    $nodeValue = str_replace(array("(", ")", "'", "$", "+", "!", "*", ","), array("%28", "%29", "%27", "%24", "%2B", "%21", "%2A", "%2C"), $nodeValue); //for Owncloud only
                     if (strpos(rawurldecode($nodeValue), rawurldecode($root)) !== false) {
                         $path = substr($nodeValue, strpos(rawurldecode($nodeValue), rawurldecode($root)) + strlen($root));
                     } else {
