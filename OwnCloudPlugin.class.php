@@ -47,7 +47,7 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
 
 
         $header = array();
-        $header[] = "Authorization: Bearer ".\Owncloud\OAuth::getAccessToken();
+        $header[] = OwnCloudFolder::getAuthHeader();
 
         $r = curl_init();
         curl_setopt($r, CURLOPT_CUSTOMREQUEST, "GET");
@@ -117,7 +117,7 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
 
 
             $header = array();
-            $header[] = "Authorization: Bearer ".\Owncloud\OAuth::getAccessToken();
+            $header[] = OwnCloudFolder::getAuthHeader();
 
             $r = curl_init();
             curl_setopt($r, CURLOPT_CUSTOMREQUEST, "GET");
@@ -177,7 +177,7 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
         }
         $webdav = $url . "remote.php/webdav/";
         $header = array();
-        $header[] = "Authorization: Bearer ".\Owncloud\OAuth::getAccessToken();
+        $header[] = OwnCloudFolder::getAuthHeader();
         $r = curl_init();
         curl_setopt($r, CURLOPT_CUSTOMREQUEST, "PROPFIND");
         curl_setopt($r, CURLOPT_URL, $webdav."/".$id);

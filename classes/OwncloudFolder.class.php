@@ -48,7 +48,7 @@ class OwncloudFolder extends VirtualFolderType {
 
             $webdav = $this->getWebDavURL();
             $header = array();
-            $header[] = "Authorization: Bearer ".\Owncloud\OAuth::getAccessToken();
+            $header[] = self::getAuthHeader();
             $header[] = "Destination: ". $webdav . $this->id;
     
             $r = curl_init();
@@ -76,7 +76,7 @@ class OwncloudFolder extends VirtualFolderType {
         $webdav = $this->getWebDavURL();
 
         $header = array();
-        $header[] = "Authorization: Bearer ".\Owncloud\OAuth::getAccessToken();
+        $header[] = self::getAuthHeader();
 
         $r = curl_init();
         curl_setopt($r, CURLOPT_CUSTOMREQUEST, "DELETE");
@@ -111,7 +111,7 @@ class OwncloudFolder extends VirtualFolderType {
         $file_ref_id = $this->id . (mb_strlen($this->id) ? '/' : '') . rawurlencode($filedata['name']);
 
         $header = array();
-        $header[] = "Authorization: Bearer ".\Owncloud\OAuth::getAccessToken();
+        $header[] = self::getAuthHeader();
 
         $url_template = "[InternetShortcut]\nURL=%s";
         if (is_a($filedata, "File")) {
@@ -174,7 +174,7 @@ class OwncloudFolder extends VirtualFolderType {
         $destination = $this->id . (mb_strlen($this->id) ? '/' : '') . rawurlencode($name);
 
         $header = array();
-        $header[] = "Authorization: Bearer ".\Owncloud\OAuth::getAccessToken();
+        $header[] = self::getAuthHeader();
         $header[] = "Destination: ". $webdav . $destination;
 
         $r = curl_init();
@@ -215,7 +215,7 @@ class OwncloudFolder extends VirtualFolderType {
         $destination = $this->id . (mb_strlen($this->id)?'/':'') . rawurlencode($name);
 
         $header = array();
-        $header[] = "Authorization: Bearer ".\Owncloud\OAuth::getAccessToken();
+        $header[] = self::getAuthHeader();
         $header[] = "Destination: ". $webdav . $destination;
 
         $r = curl_init();
@@ -256,7 +256,7 @@ class OwncloudFolder extends VirtualFolderType {
         $destination = $this->id . (mb_strlen($this->id)?'/':'') . rawurlencode($name);
 
         $header = array();
-        $header[] = "Authorization: Bearer ".\Owncloud\OAuth::getAccessToken();
+        $header[] = self::getAuthHeader();
         $header[] = "Destination: ". $webdav . $destination;
 
         $r = curl_init();
@@ -295,7 +295,7 @@ class OwncloudFolder extends VirtualFolderType {
         $destination = $this->id . (mb_strlen($this->id)?'/':'') . $name;
 
         $header = array();
-        $header[] = "Authorization: Bearer ".\Owncloud\OAuth::getAccessToken();
+        $header[] = self::getAuthHeader();
 
         $r = curl_init();
 
@@ -332,7 +332,7 @@ class OwncloudFolder extends VirtualFolderType {
 
 
         $header = array();
-        $header[] = "Authorization: Bearer ".\Owncloud\OAuth::getAccessToken();
+        $header[] = self::getAuthHeader();
         $header[] = "Depth: 1";
 
         $r = curl_init();
@@ -354,6 +354,14 @@ class OwncloudFolder extends VirtualFolderType {
 
         $doc = new DOMDocument();
         $doc->loadXML($xml);
+
+        foreach ($doc->getElementsByTagNameNS("DAV:", "error") as $error) {
+            foreach ($error->childNodes as $node) {
+                if (strtolower($node->tagName) === "s:message") {
+                    PageLayout::postError($node->nodeValue);
+                }
+            }
+        }
 
         foreach ($doc->getElementsByTagNameNS("DAV:","response") as $file) {
             //response
@@ -393,7 +401,7 @@ class OwncloudFolder extends VirtualFolderType {
                         if ($prop->childNodes) {
                             foreach ($prop->childNodes as $attr) {
                                 if (strtolower($attr->tagName) === "d:resourcetype") {
-                                    $file_attributes['type'] = $attr->childNodes[0] && strtolower($attr->childNodes[0]->tagName) === "d:collection" ? "folder" : "file";
+                                    $file_attributes['type'] = $attr->childNodes->item(0) && strtolower($attr->childNodes->item(0)->tagName) === "d:collection" ? "folder" : "file";
                                 }
                                 if (strtolower($attr->tagName) === "d:getcontentlength") {
                                     $file_attributes['size'] = $attr->nodeValue;
@@ -433,7 +441,7 @@ class OwncloudFolder extends VirtualFolderType {
                         'mime_type' => $content_type,
                         'description' => "",
                         'chdate' => $file_attributes['chdate'],
-                        'download_url' => URLHelper::getURL("plugins.php/owncloudplugin/download/" . ($this->id ? $this->id . "/" : "") . $file_attributes['name'])
+                        'download_url' => URLHelper::getURL("plugins.php/owncloudplugin/download/" . ($this->id ? $this->id . "/" : "") . rawurlencode($file_attributes['name']))
                     );
                 }
             }
@@ -466,7 +474,7 @@ class OwncloudFolder extends VirtualFolderType {
             $this->folderdata['id'] = $request['name'];
         } else {
             $this->folderdata['id'] = $request['parent_id'] . '/' . $request['name'];
-        }        
+        }
         $this->folderdata['parent_id'] = $request['parent_id'];
         $this->folderdata['range_type'] = $plugin->getPluginId();
         $this->folderdata['range_id'] = $plugin->getPluginName();
@@ -501,6 +509,10 @@ class OwncloudFolder extends VirtualFolderType {
             }
         }
         return false;
+    }
+
+    static public function getAuthHeader() {
+        return "Authorization: Bearer " . \Owncloud\OAuth::getAccessToken();
     }
 
 }

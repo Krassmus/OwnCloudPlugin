@@ -35,4 +35,7 @@ Die nächsten Schritte sind für beide Wege wieder dieselben:
 5. Die OwnCloud fragt Sie, ob Stud.IP in Ihrem Namen Daten abrufen und verändern darf. Klicken Sie auf "Authorisieren".
 6. Jetzt landen Sie wieder in Stud.IP und die Schnittstelle zwischen Stud.IP und OwnCloud sollte eingerichtet sein.
 
+Probleme?
+
+* Manchmal scheint fast alles zu funktionieren. OAuth-Access-Token ist da, Refresh-Token ist da und der Refresh scheint auch zu klappen, aber es werden keine Dateien und Ordner angezeigt. Es erscheint stattdessen eine Fehlermeldung: "No 'Authorization: Basic' header found. Either the client didn't send one, or the server is misconfigured, No 'Authorization: Basic' header found. Either the client didn't send one, or the server is misconfigured, No 'Authorization: Bearer' header found. Either the client didn't send one, or the server is mis-configured". In dem Fall muss man vermutlich in die Datei .htacess die Zeile einbauen `SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1` 
 

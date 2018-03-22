@@ -13,7 +13,7 @@ class OAuth {
             throw new Exception("No valid access token. Please refresh you connection to Owncloud.");
         }
 
-        $header[] = "Authorization: Bearer ".$accessToken;
+        $header[] = OwnCloudFolder::getAuthHeader();
 
         $r = curl_init();
         curl_setopt($r, CURLOPT_URL, $url);
