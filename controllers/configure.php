@@ -14,7 +14,7 @@ class ConfigureController extends PluginController
             $config = UserConfig::get($GLOBALS['user']->id);
             $data = Request::getArray("owncloud");
             foreach ($data as $key => $value) {
-                $config->store("OWNCLOUD_".strtoupper($key)."_USER", $value);
+                $config->store("OWNCLOUD_".strtoupper($key).($key === "activated" ? "" : "_USER"), $value);
             }
             if (!$data['activated']) {
                 $config->store("OWNCLOUD_ACTIVATED", 0);
