@@ -314,7 +314,7 @@ class OwncloudFolder extends VirtualFolderType {
 
     protected function getWebDavURL()
     {
-        $url = Config::get()->OWNCLOUD_ENDPOINT ?: UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_ENDPOINT;
+        $url = Config::get()->OWNCLOUD_ENDPOINT ?: UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_ENDPOINT_USER;
         if ($url[strlen($url) - 1] !== "/") {
             $url .= "/";
         }

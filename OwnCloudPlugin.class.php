@@ -39,7 +39,7 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
         $args = func_get_args();
         $file_id = implode("/", array_map("rawurlencode", $args));
 
-        $url = Config::get()->OWNCLOUD_ENDPOINT ?: UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_ENDPOINT;
+        $url = UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_ENDPOINT ?: Config::get()->OWNCLOUD_ENDPOINT_USER;
         if ($url[strlen($url) - 1] !== "/") {
             $url .= "/";
         }
@@ -109,7 +109,7 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
         $file->content_terms_of_use_id = 'UNDEF_LICENSE';
         
         if ($with_blob) {
-            $url = Config::get()->OWNCLOUD_ENDPOINT ?: UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_ENDPOINT;
+            $url = Config::get()->OWNCLOUD_ENDPOINT ?: UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_ENDPOINT_USER;
             if ($url[strlen($url) - 1] !== "/") {
                 $url .= "/";
             }
@@ -171,7 +171,7 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
 
     protected function getType($id)
     {
-        $url = Config::get()->OWNCLOUD_ENDPOINT ?: UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_ENDPOINT;
+        $url = Config::get()->OWNCLOUD_ENDPOINT ?: UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_ENDPOINT_USER;
         if ($url[strlen($url) - 1] !== "/") {
             $url .= "/";
         }
