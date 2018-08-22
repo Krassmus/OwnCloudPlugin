@@ -54,6 +54,7 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
         curl_setopt($r, CURLOPT_URL, $webdav . $file_id);
         curl_setopt($r, CURLOPT_HTTPHEADER, ($header));
         curl_setopt($r, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($r, CURLOPT_SSL_VERIFYPEER, (bool) Config::get()->OWNCLOUD_SSL_VERIFYPEER);
 
         $content = curl_exec($r);
         $info = curl_getinfo($r);
@@ -124,6 +125,7 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
             curl_setopt($r, CURLOPT_URL, $webdav.$file_id);
             curl_setopt($r, CURLOPT_HTTPHEADER, ($header));
             curl_setopt($r, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($r, CURLOPT_SSL_VERIFYPEER, (bool) Config::get()->OWNCLOUD_SSL_VERIFYPEER);
 
             $content = curl_exec($r);
             $info = curl_getinfo($r);
@@ -183,6 +185,7 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
         curl_setopt($r, CURLOPT_URL, $webdav."/".$id);
         curl_setopt($r, CURLOPT_HTTPHEADER, ($header));
         curl_setopt($r, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($r, CURLOPT_SSL_VERIFYPEER, (bool) Config::get()->OWNCLOUD_SSL_VERIFYPEER);
         $xml = curl_exec($r);
         curl_close($r);
         $doc = new DOMDocument();

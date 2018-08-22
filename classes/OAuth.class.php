@@ -20,6 +20,7 @@ class OAuth {
         curl_setopt($r, CURLOPT_POST, $type === "get" ? 0 : 1);
         curl_setopt($r, CURLOPT_HTTPHEADER, $header);
         curl_setopt($r, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($r, CURLOPT_SSL_VERIFYPEER, (bool) Config::get()->OWNCLOUD_SSL_VERIFYPEER);
 
         curl_setopt($r, CURLOPT_POSTFIELDS, $payload);
 
@@ -81,6 +82,7 @@ class OAuth {
         curl_setopt($r, CURLOPT_POST, 1);
         curl_setopt($r, CURLOPT_HTTPHEADER, $header);
         curl_setopt($r, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($r, CURLOPT_SSL_VERIFYPEER, (bool) Config::get()->OWNCLOUD_SSL_VERIFYPEER);
 
         curl_setopt($r, CURLOPT_POSTFIELDS, $payload);
 

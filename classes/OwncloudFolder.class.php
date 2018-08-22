@@ -55,7 +55,8 @@ class OwncloudFolder extends VirtualFolderType {
             curl_setopt($r, CURLOPT_CUSTOMREQUEST, "MOVE");
             curl_setopt($r, CURLOPT_URL, $webdav . $old_id);
             curl_setopt($r, CURLOPT_HTTPHEADER, ($header));
-            curl_setopt($r, CURLOPT_RETURNTRANSFER, 1);    
+            curl_setopt($r, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($r, CURLOPT_SSL_VERIFYPEER, (bool) Config::get()->OWNCLOUD_SSL_VERIFYPEER);
             curl_exec($r);
             $status = curl_getinfo($r, CURLINFO_HTTP_CODE);
             curl_close($r);
@@ -83,6 +84,7 @@ class OwncloudFolder extends VirtualFolderType {
         curl_setopt($r, CURLOPT_URL, $webdav . $file_ref_id);
         curl_setopt($r, CURLOPT_HTTPHEADER, ($header));
         curl_setopt($r, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($r, CURLOPT_SSL_VERIFYPEER, (bool) Config::get()->OWNCLOUD_SSL_VERIFYPEER);
 
         curl_exec($r);
         $status = curl_getinfo($r, CURLINFO_HTTP_CODE);
@@ -140,6 +142,7 @@ class OwncloudFolder extends VirtualFolderType {
         curl_setopt($r, CURLOPT_INFILE, $fh_res);
         curl_setopt($r, CURLOPT_INFILESIZE, filesize($data));        
         curl_setopt($r, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($r, CURLOPT_SSL_VERIFYPEER, (bool) Config::get()->OWNCLOUD_SSL_VERIFYPEER);
         curl_exec($r);
         $status = curl_getinfo($r, CURLINFO_HTTP_CODE);
         curl_close($r);
@@ -181,7 +184,8 @@ class OwncloudFolder extends VirtualFolderType {
         curl_setopt($r, CURLOPT_CUSTOMREQUEST, "COPY");
         curl_setopt($r, CURLOPT_URL, $webdav . $file_ref_id);
         curl_setopt($r, CURLOPT_HTTPHEADER, ($header));
-        curl_setopt($r, CURLOPT_RETURNTRANSFER, 1);  
+        curl_setopt($r, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($r, CURLOPT_SSL_VERIFYPEER, (bool) Config::get()->OWNCLOUD_SSL_VERIFYPEER);
 
         curl_exec($r);
         $status = curl_getinfo($r, CURLINFO_HTTP_CODE);
@@ -223,6 +227,7 @@ class OwncloudFolder extends VirtualFolderType {
         curl_setopt($r, CURLOPT_URL, $webdav . $file_ref_id);
         curl_setopt($r, CURLOPT_HTTPHEADER, ($header));
         curl_setopt($r, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($r, CURLOPT_SSL_VERIFYPEER, (bool) Config::get()->OWNCLOUD_SSL_VERIFYPEER);
 
         curl_exec($r);
         $status = curl_getinfo($r, CURLINFO_HTTP_CODE);
@@ -264,6 +269,7 @@ class OwncloudFolder extends VirtualFolderType {
         curl_setopt($r, CURLOPT_URL, $webdav . $file_ref_id);
         curl_setopt($r, CURLOPT_HTTPHEADER, ($header));
         curl_setopt($r, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($r, CURLOPT_SSL_VERIFYPEER, (bool) Config::get()->OWNCLOUD_SSL_VERIFYPEER);
 
         curl_exec($r);
         $status = curl_getinfo($r, CURLINFO_HTTP_CODE);
@@ -303,6 +309,7 @@ class OwncloudFolder extends VirtualFolderType {
         curl_setopt($r, CURLOPT_URL, $webdav . $destination);
         curl_setopt($r, CURLOPT_HTTPHEADER, ($header));
         curl_setopt($r, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($r, CURLOPT_SSL_VERIFYPEER, (bool) Config::get()->OWNCLOUD_SSL_VERIFYPEER);
 
         curl_exec($r);
         $status = curl_getinfo($r, CURLINFO_HTTP_CODE);
@@ -340,6 +347,7 @@ class OwncloudFolder extends VirtualFolderType {
         curl_setopt($r, CURLOPT_URL, $webdav . $this->id);
         curl_setopt($r, CURLOPT_HTTPHEADER, ($header));
         curl_setopt($r, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($r, CURLOPT_SSL_VERIFYPEER, (bool) Config::get()->OWNCLOUD_SSL_VERIFYPEER);
 
         $xml = curl_exec($r);
         curl_close($r);
