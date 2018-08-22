@@ -66,15 +66,18 @@ class OauthController extends PluginController
 
         curl_setopt($r, CURLOPT_POSTFIELDS, $payload);
 
-        $json = curl_exec($r);
+        $response = curl_exec($r);
         curl_close($r);
 
-        $json = json_decode($json, true);
+        $json = json_decode($response, true);
 
         if ($json['error']) {
             PageLayout::postError(_("Authentifizierungsfehler:")." ".$json['error']);
             $this->redirect(URLHelper::getURL("dispatch.php/files/index"));
         } else {
+            if ($response === false) {
+                PageLayout::postError(_("Fehler beim Abrufen der OAuth-Token:"), array(curl_error($r)));
+            }
             if (false) {
                 var_dump($json);
                 $this->render_nothing();
