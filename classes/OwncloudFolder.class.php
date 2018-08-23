@@ -58,6 +58,9 @@ class OwncloudFolder extends VirtualFolderType {
             curl_setopt($r, CURLOPT_RETURNTRANSFER, 1);
             curl_setopt($r, CURLOPT_SSL_VERIFYPEER, (bool) Config::get()->OWNCLOUD_SSL_VERIFYPEER);
             curl_setopt($r, CURLOPT_SSL_VERIFYHOST, (bool) Config::get()->OWNCLOUD_SSL_VERIFYPEER);
+            if ($GLOBALS['OWNCLOUD_VERBOSE']) {
+                curl_setopt($r, CURLOPT_VERBOSE, true);
+            }
             curl_exec($r);
             $status = curl_getinfo($r, CURLINFO_HTTP_CODE);
             curl_close($r);
@@ -87,6 +90,9 @@ class OwncloudFolder extends VirtualFolderType {
         curl_setopt($r, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($r, CURLOPT_SSL_VERIFYPEER, (bool) Config::get()->OWNCLOUD_SSL_VERIFYPEER);
         curl_setopt($r, CURLOPT_SSL_VERIFYHOST, (bool) Config::get()->OWNCLOUD_SSL_VERIFYPEER);
+        if ($GLOBALS['OWNCLOUD_VERBOSE']) {
+            curl_setopt($r, CURLOPT_VERBOSE, true);
+        }
 
         curl_exec($r);
         $status = curl_getinfo($r, CURLINFO_HTTP_CODE);
@@ -146,6 +152,9 @@ class OwncloudFolder extends VirtualFolderType {
         curl_setopt($r, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($r, CURLOPT_SSL_VERIFYPEER, (bool) Config::get()->OWNCLOUD_SSL_VERIFYPEER);
         curl_setopt($r, CURLOPT_SSL_VERIFYHOST, (bool) Config::get()->OWNCLOUD_SSL_VERIFYPEER);
+        if ($GLOBALS['OWNCLOUD_VERBOSE']) {
+            curl_setopt($r, CURLOPT_VERBOSE, true);
+        }
         curl_exec($r);
         $status = curl_getinfo($r, CURLINFO_HTTP_CODE);
         curl_close($r);
@@ -190,6 +199,9 @@ class OwncloudFolder extends VirtualFolderType {
         curl_setopt($r, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($r, CURLOPT_SSL_VERIFYPEER, (bool) Config::get()->OWNCLOUD_SSL_VERIFYPEER);
         curl_setopt($r, CURLOPT_SSL_VERIFYHOST, (bool) Config::get()->OWNCLOUD_SSL_VERIFYPEER);
+        if ($GLOBALS['OWNCLOUD_VERBOSE']) {
+            curl_setopt($r, CURLOPT_VERBOSE, true);
+        }
 
         curl_exec($r);
         $status = curl_getinfo($r, CURLINFO_HTTP_CODE);
@@ -233,6 +245,9 @@ class OwncloudFolder extends VirtualFolderType {
         curl_setopt($r, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($r, CURLOPT_SSL_VERIFYPEER, (bool) Config::get()->OWNCLOUD_SSL_VERIFYPEER);
         curl_setopt($r, CURLOPT_SSL_VERIFYHOST, (bool) Config::get()->OWNCLOUD_SSL_VERIFYPEER);
+        if ($GLOBALS['OWNCLOUD_VERBOSE']) {
+            curl_setopt($r, CURLOPT_VERBOSE, true);
+        }
 
         curl_exec($r);
         $status = curl_getinfo($r, CURLINFO_HTTP_CODE);
@@ -276,6 +291,9 @@ class OwncloudFolder extends VirtualFolderType {
         curl_setopt($r, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($r, CURLOPT_SSL_VERIFYPEER, (bool) Config::get()->OWNCLOUD_SSL_VERIFYPEER);
         curl_setopt($r, CURLOPT_SSL_VERIFYHOST, (bool) Config::get()->OWNCLOUD_SSL_VERIFYPEER);
+        if ($GLOBALS['OWNCLOUD_VERBOSE']) {
+            curl_setopt($r, CURLOPT_VERBOSE, true);
+        }
 
         curl_exec($r);
         $status = curl_getinfo($r, CURLINFO_HTTP_CODE);
@@ -317,6 +335,9 @@ class OwncloudFolder extends VirtualFolderType {
         curl_setopt($r, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($r, CURLOPT_SSL_VERIFYPEER, (bool) Config::get()->OWNCLOUD_SSL_VERIFYPEER);
         curl_setopt($r, CURLOPT_SSL_VERIFYHOST, (bool) Config::get()->OWNCLOUD_SSL_VERIFYPEER);
+        if ($GLOBALS['OWNCLOUD_VERBOSE']) {
+            curl_setopt($r, CURLOPT_VERBOSE, true);
+        }
 
         curl_exec($r);
         $status = curl_getinfo($r, CURLINFO_HTTP_CODE);
@@ -356,6 +377,9 @@ class OwncloudFolder extends VirtualFolderType {
         curl_setopt($r, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($r, CURLOPT_SSL_VERIFYPEER, (bool) Config::get()->OWNCLOUD_SSL_VERIFYPEER);
         curl_setopt($r, CURLOPT_SSL_VERIFYHOST, (bool) Config::get()->OWNCLOUD_SSL_VERIFYPEER);
+        if ($GLOBALS['OWNCLOUD_VERBOSE']) {
+            curl_setopt($r, CURLOPT_VERBOSE, true);
+        }
 
         $xml = curl_exec($r);
         curl_close($r);

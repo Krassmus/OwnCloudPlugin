@@ -56,6 +56,9 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
         curl_setopt($r, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($r, CURLOPT_SSL_VERIFYPEER, (bool) Config::get()->OWNCLOUD_SSL_VERIFYPEER);
         curl_setopt($r, CURLOPT_SSL_VERIFYHOST, (bool) Config::get()->OWNCLOUD_SSL_VERIFYPEER);
+        if ($GLOBALS['OWNCLOUD_VERBOSE']) {
+            curl_setopt($r, CURLOPT_VERBOSE, true);
+        }
 
         $content = curl_exec($r);
         $info = curl_getinfo($r);
@@ -128,6 +131,9 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
             curl_setopt($r, CURLOPT_RETURNTRANSFER, 1);
             curl_setopt($r, CURLOPT_SSL_VERIFYPEER, (bool) Config::get()->OWNCLOUD_SSL_VERIFYPEER);
             curl_setopt($r, CURLOPT_SSL_VERIFYHOST, (bool) Config::get()->OWNCLOUD_SSL_VERIFYPEER);
+            if ($GLOBALS['OWNCLOUD_VERBOSE']) {
+                curl_setopt($r, CURLOPT_VERBOSE, true);
+            }
 
             $content = curl_exec($r);
             $info = curl_getinfo($r);
@@ -189,6 +195,9 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
         curl_setopt($r, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($r, CURLOPT_SSL_VERIFYPEER, (bool) Config::get()->OWNCLOUD_SSL_VERIFYPEER);
         curl_setopt($r, CURLOPT_SSL_VERIFYHOST, (bool) Config::get()->OWNCLOUD_SSL_VERIFYPEER);
+        if ($GLOBALS['OWNCLOUD_VERBOSE']) {
+            curl_setopt($r, CURLOPT_VERBOSE, true);
+        }
         $xml = curl_exec($r);
         curl_close($r);
         $doc = new DOMDocument();
