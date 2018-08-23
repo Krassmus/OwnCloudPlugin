@@ -39,7 +39,7 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
         $args = func_get_args();
         $file_id = implode("/", array_map("rawurlencode", $args));
 
-        $url = UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_ENDPOINT ?: Config::get()->OWNCLOUD_ENDPOINT_USER;
+        $url = Config::get()->OWNCLOUD_ENDPOINT ?: UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_ENDPOINT_USER;
         if ($url[strlen($url) - 1] !== "/") {
             $url .= "/";
         }
