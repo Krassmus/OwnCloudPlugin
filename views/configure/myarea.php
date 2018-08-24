@@ -11,7 +11,7 @@
 
         <? if (\Owncloud\OAuth::isReady()) : ?>
             <?= MessageBox::info(_("OwnCloud ist verknüpft")) ?>
-        <? elseif(UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_ENDPOINT_USER || Config::get()->OWNCLOUD_ENDPOINT) : ?>
+        <? elseif((UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_ENDPOINT_USER || Config::get()->OWNCLOUD_ENDPOINT) && UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_ACTIVATED) : ?>
             <div style="text-align: center;">
                 <?= \Studip\LinkButton::create(_("OwnCloud für Stud.IP freigeben"), PluginEngine::getURL($plugin, array(), "oauth/request_access_token")) ?>
             </div>
