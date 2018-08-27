@@ -1,6 +1,5 @@
 <form action="<?= PluginEngine::getLink($plugin, array(), "configure/myarea") ?>"
       method="post"
-      data-dialog
       class="default owncloud"
       autocomplete="off">
 
