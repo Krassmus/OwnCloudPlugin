@@ -382,10 +382,15 @@ class OwncloudFolder extends VirtualFolderType {
         }
 
         $xml = curl_exec($r);
+        $info = curl_getinfo($r);
+        if ($info['http_code'] === 401 && \Owncloud\OAuth::hasAccessToken()) {
+            \Owncloud\OAuth::removeAccessToken();
+            PageLayout::postError(sprintf(_("Zugangsberechtigung zu %s abgelaufen. Erneuern Sie die Verbindung zu %s."), Config::get()->OWNCLOUD_NAME, Config::get()->OWNCLOUD_NAME));
+        }
         curl_close($r);
 
         if (!$xml) {
-            PageLayout::postError(_("Konnte keine Daten von OwnCloud bekommen."));
+            PageLayout::postError(sprintf(_("Konnte keine Daten von %s bekommen."), Config::get()->OWNCLOUD_NAME));
             $this->subfolders = array();
             $this->files = array();
             $this->did_propfind = true;

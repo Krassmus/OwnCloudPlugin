@@ -6,20 +6,20 @@
 
     <fieldset>
         <legend>
-            <?= _("OwnCloud konfigurieren") ?>
+            <?= sprintf(_("%s konfigurieren"), Config::get()->OWNCLOUD_NAME) ?>
         </legend>
 
         <? if (\Owncloud\OAuth::isReady()) : ?>
-            <?= MessageBox::info(_("OwnCloud ist verknüpft")) ?>
+            <?= MessageBox::info(sprintf(_("%s ist verknüpft"), Config::get()->OWNCLOUD_NAME)) ?>
         <? elseif((UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_ENDPOINT_USER || Config::get()->OWNCLOUD_ENDPOINT) && UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_ACTIVATED) : ?>
             <div style="text-align: center;">
-                <?= \Studip\LinkButton::create(_("OwnCloud für Stud.IP freigeben"), PluginEngine::getURL($plugin, array(), "oauth/request_access_token")) ?>
+                <?= \Studip\LinkButton::create(sprintf(_("%s für Stud.IP freigeben"), Config::get()->OWNCLOUD_NAME), PluginEngine::getURL($plugin, array(), "oauth/request_access_token")) ?>
             </div>
         <? endif ?>
 
         <? if (!Config::get()->OWNCLOUD_ENDPOINT) : ?>
             <label>
-                <?= _("Adresse der OwnCloud") ?>
+                <?= sprintf(_("Adresse der %s"), Config::get()->OWNCLOUD_NAME) ?>
                 <input type="text" name="owncloud[endpoint]" value="<?= htmlReady(UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_ENDPOINT_USER) ?>" placeholder="<?= "z.B. https://myserver.tdl/owncloud" ?>">
             </label>
         <? endif ?>
@@ -39,7 +39,7 @@
 
             <label>
                 <? URLHelper::setBaseURL($GLOBALS['ABSOLUTE_URI_STUDIP']) ?>
-                <?= _("Redirect-URI (zum Eintragen in der OwnCloud)") ?>
+                <?= sprintf(_("Redirect-URI (zum Eintragen in der %s)"), Config::get()->OWNCLOUD_NAME) ?>
                 <input type="text" readonly value="<?= htmlReady(PluginEngine::getURL($plugin, array(), "oauth/receive_access_token"), true) ?>">
                 <? URLHelper::setBaseURL("/") ?>
             </label>

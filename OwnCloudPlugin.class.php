@@ -7,7 +7,7 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
 
     public function getFileSelectNavigation()
     {
-        $nav = new Navigation(_("OwnCloud"));
+        $nav = new Navigation(Config::get()->OWNCLOUD_NAME);
         $nav->setImage(Icon::create("cloud", "clickable"));
         return $nav;
     }

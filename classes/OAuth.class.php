@@ -10,7 +10,7 @@ class OAuth {
 
         $accessToken = self::getAccessToken();
         if (!$accessToken) {
-            throw new Exception("No valid access token. Please refresh you connection to Owncloud.");
+            throw new Exception(sprintf("No valid access token. Please refresh your connection to %s.", Config::get()->OWNCLOUD_NAME));
         }
 
         $header[] = OwnCloudFolder::getAuthHeader();
@@ -134,5 +134,11 @@ class OAuth {
             }
             $config->store("OWNCLOUD_ACCESS_TOKEN_EXPIRES", time() + $json['expires_in']);
         }
+    }
+
+    static public function removeAccessToken()
+    {
+        \UserConfig::get($GLOBALS['user']->id)->delete("OWNCLOUD_ACCESS_TOKEN");
+        \UserConfig::get($GLOBALS['user']->id)->delete("OWNCLOUD_REFRESH_TOKEN");
     }
 }

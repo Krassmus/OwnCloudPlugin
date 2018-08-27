@@ -9,7 +9,7 @@ class ConfigureController extends PluginController
         } else {
             Navigation::activateItem('/profile/files');
         }
-        PageLayout::setTitle(_("OwnCloud"));
+        PageLayout::setTitle(Config::get()->OWNCLOUD_NAME);
         if (Request::isPost()) {
             $config = UserConfig::get($GLOBALS['user']->id);
             $data = Request::getArray("owncloud");
