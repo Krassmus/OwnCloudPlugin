@@ -10,6 +10,16 @@ class ConfigureController extends PluginController
             Navigation::activateItem('/profile/files');
         }
         PageLayout::setTitle(Config::get()->OWNCLOUD_NAME);
+        if (Request::isPost() && Request::submitted("remove")) {
+            $config = UserConfig::get($GLOBALS['user']->id);
+            $config->unsetValue("OWNCLOUD_ACCESS_TOKEN");
+            $config->unsetValue("OWNCLOUD_REFRESH_TOKEN");
+            $config->unsetValue("OWNCLOUD_ACTIVATED");
+            $config->unsetValue("OWNCLOUD_ACCESS_TOKEN_EXPIRES");
+            PageLayout::postMessage(MessageBox::success(_("Zugang zur Owncloud wurde aufgehoben.")));
+            $this->redirect(URLHelper::getURL("dispatch.php/files"));
+            return;
+        }
         if (Request::isPost()) {
             $config = UserConfig::get($GLOBALS['user']->id);
             $data = Request::getArray("owncloud");

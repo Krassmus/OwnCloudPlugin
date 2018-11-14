@@ -52,6 +52,9 @@
 
     <div data-dialog-button>
         <?= \Studip\Button::create(_("Speichern")) ?>
+        <? if (\Owncloud\OAuth::isReady()) : ?>
+            <?= \Studip\Button::create(_("Zugang aufheben"), "remove", array('data-confirm' => _("Wirklich den Zugang zur Owncloud aufheben?"))) ?>
+        <? endif ?>
     </div>
 </form>
 
