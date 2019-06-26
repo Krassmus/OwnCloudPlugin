@@ -6,8 +6,10 @@ class ConfigureController extends PluginController
     {
         if (Navigation::hasItem("/profile/files/OwnCloudPlugin")) {
             Navigation::activateItem('/profile/files/OwnCloudPlugin');
-        } else {
+        } elseif(Navigation::hasItem('/profile/files')) {
             Navigation::activateItem('/profile/files');
+        } else {
+            Navigation::activateItem('/files_dashboard/files');
         }
         PageLayout::setTitle(Config::get()->OWNCLOUD_NAME);
         if (Request::isPost() && Request::submitted("remove")) {
