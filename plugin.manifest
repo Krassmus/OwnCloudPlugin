@@ -3,3 +3,4 @@ pluginclassname=OwnCloudPlugin
 version=1.2.1
 origin=data-quest
 studipMinVersion=4.0
+studipMinVersion=4.4.99
