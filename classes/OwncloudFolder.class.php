@@ -474,6 +474,7 @@ class OwncloudFolder extends VirtualFolderType {
                         'id' => ($this->id ? $this->id . "/" : "") . rawurlencode($file_attributes['name']),
                         'name' => $file_attributes['name'],
                         'parent_id' => $this->id,
+                        'user_id' => $GLOBALS['user']->id,
                         'range_type' => $this->plugin_id,
                         'range_id' => 'OwnCloudPlugin'
                     ), $this->plugin_id);
@@ -485,6 +486,7 @@ class OwncloudFolder extends VirtualFolderType {
                         'size' => $file_attributes['size'],
                         'mime_type' => $content_type,
                         'description' => "",
+                        'user_id' => $GLOBALS['user']->id,
                         'chdate' => $file_attributes['chdate'],
                         'download_url' => URLHelper::getURL("plugins.php/owncloudplugin/download/" . ($this->id ? $this->id . "/" : "") . rawurlencode($file_attributes['name']))
                     );
