@@ -4,13 +4,7 @@ class ConfigureController extends PluginController
 {
     public function myarea_action()
     {
-        if (Navigation::hasItem("/profile/files/OwnCloudPlugin")) {
-            Navigation::activateItem('/profile/files/OwnCloudPlugin');
-        } elseif(Navigation::hasItem('/profile/files')) {
-            Navigation::activateItem('/profile/files');
-        } else {
-            Navigation::activateItem('/files_dashboard/files');
-        }
+        Navigation::activateItem('/files/my_files');
         PageLayout::setTitle(Config::get()->OWNCLOUD_NAME);
         if (Request::isPost() && Request::submitted("remove")) {
             $config = UserConfig::get($GLOBALS['user']->id);

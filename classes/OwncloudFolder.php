@@ -41,7 +41,7 @@ class OwncloudFolder extends VirtualFolderType {
 
 
     public function store()
-    {        
+    {
         $old_id = $this->parent_id . '/' . rawurlencode($this->name);
 
         if ($this->getId() != $old_id) {
@@ -50,7 +50,7 @@ class OwncloudFolder extends VirtualFolderType {
             $header = array();
             $header[] = self::getAuthHeader();
             $header[] = "Destination: ". $webdav . $this->id;
-    
+
             $r = curl_init();
             curl_setopt($r, CURLOPT_CUSTOMREQUEST, "MOVE");
             curl_setopt($r, CURLOPT_URL, $webdav . $old_id);
@@ -100,11 +100,11 @@ class OwncloudFolder extends VirtualFolderType {
         return ($status >= 200) && ($status < 300);
     }
 
-    public function createFile($filedata)
-    {       
+    public function addFile(FileType $file, $user_id = null)
+    {
         $webdav = $this->getWebDavURL();
 
-        if ($this->fileExists($filedata['name'])) {
+        if ($this->fileExists($file->getFilename())) {
             if (strpos($filedata['name'], ".")) {
                 $end = substr($filedata['name'], strpos($filedata['name'], "."));
                 $name_raw = substr($filedata['name'], 0, strpos($filedata['name'], "."));
@@ -117,14 +117,19 @@ class OwncloudFolder extends VirtualFolderType {
                 $new_name = $name_raw."(".$i.").".$end;
             } while ($this->fileExists($new_name));
             $filedata['name'] = $new_name;
+            $file->data['name'] = $new_name;
         }
-        $file_ref_id = $this->id . (mb_strlen($this->id) ? '/' : '') . rawurlencode($filedata['name']);
+
+        $file_ref_id = $this->id . (mb_strlen($this->id) ? '/' : '') . rawurlencode($file->getFilename());
 
         $header = array();
         $header[] = self::getAuthHeader();
 
         $url_template = "[InternetShortcut]\nURL=%s";
-        if (is_a($filedata, "File")) {
+
+        $data = $GLOBALS['TMP_PATH']."/file_".md5(uniqid());
+
+        if (is_a($file, "URLFile")) {
             if ($filedata->getURL()) {
                 $data = $GLOBALS['TMP_PATH']."/file_".md5(uniqid());
                 file_put_contents($data, sprintf($url_template, $filedata->getURL()));
@@ -148,7 +153,7 @@ class OwncloudFolder extends VirtualFolderType {
         curl_setopt($r, CURLOPT_URL, $webdav . $file_ref_id);
         curl_setopt($r, CURLOPT_HTTPHEADER, ($header));
         curl_setopt($r, CURLOPT_INFILE, $fh_res);
-        curl_setopt($r, CURLOPT_INFILESIZE, filesize($data));        
+        curl_setopt($r, CURLOPT_INFILESIZE, filesize($data));
         curl_setopt($r, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($r, CURLOPT_SSL_VERIFYPEER, (bool) Config::get()->OWNCLOUD_SSL_VERIFYPEER);
         curl_setopt($r, CURLOPT_SSL_VERIFYHOST, (bool) Config::get()->OWNCLOUD_SSL_VERIFYPEER);
@@ -167,7 +172,7 @@ class OwncloudFolder extends VirtualFolderType {
     public function copyFile($file_ref_id)
     {
         $webdav = $this->getWebDavURL();
-        
+
         $tmp_parts = explode('/', $file_ref_id);
 
         $name = end($tmp_parts);
@@ -262,7 +267,7 @@ class OwncloudFolder extends VirtualFolderType {
         if (!$name) {
             return false;
         }
-        
+
         $webdav = $this->getWebDavURL();
         if ($this->fileExists(rawurlencode($name))) {
             if (strpos($name, ".")) {
@@ -298,7 +303,7 @@ class OwncloudFolder extends VirtualFolderType {
         curl_exec($r);
         $status = curl_getinfo($r, CURLINFO_HTTP_CODE);
         curl_close($r);
-        
+
         $plugin = PluginManager::getInstance()->getPlugin("OwnCloudPlugin");
         return $plugin->getPreparedFile($destination);
     }
@@ -480,7 +485,7 @@ class OwncloudFolder extends VirtualFolderType {
                     ), $this->plugin_id);
                 } else {
                     $content_type = $file_attributes['contenttype'] ?: get_mime_type($file_attributes['name']);
-                    $this->files[] = (object) array(
+                    $this->files[] = new OwncloudFile([
                         'id' => ($this->id ? $this->id . "/" : "") . rawurlencode($file_attributes['name']),
                         'name' => $file_attributes['name'],
                         'size' => $file_attributes['size'],
@@ -489,10 +494,11 @@ class OwncloudFolder extends VirtualFolderType {
                         'user_id' => $GLOBALS['user']->id,
                         'chdate' => $file_attributes['chdate'],
                         'download_url' => URLHelper::getURL("plugins.php/owncloudplugin/download/" . ($this->id ? $this->id . "/" : "") . rawurlencode($file_attributes['name']))
-                    );
+                    ], $this);
                 }
             }
         }
+        //var_dump($this->files); die();
         $this->did_propfind = true;
     }
 
@@ -510,13 +516,12 @@ class OwncloudFolder extends VirtualFolderType {
 
     public function setDataFromEditTemplate($request)
     {
-
         if (!$request['name']) {
             return MessageBox::error(_('Die Bezeichnung des Ordners fehlt.'));
         }
 
         $plugin = PluginEngine::getPlugin($request["from_plugin"]);
-    
+
         if (empty($request['parent_id'])) {
             $this->folderdata['id'] = $request['name'];
         } else {
@@ -558,8 +563,19 @@ class OwncloudFolder extends VirtualFolderType {
         return false;
     }
 
-    static public function getAuthHeader() {
+    static public function getAuthHeader()
+    {
         return "Authorization: Bearer " . \Owncloud\OAuth::getAccessToken();
+    }
+
+    public function getAdditionalColumns()
+    {
+        return [];
+    }
+
+    public function getAdditionalActionButtons()
+    {
+        return [];
     }
 
 }

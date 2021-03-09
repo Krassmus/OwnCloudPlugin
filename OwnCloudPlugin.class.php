@@ -1,7 +1,8 @@
 <?php
 
 require_once __DIR__."/classes/OAuth.class.php";
-require_once __DIR__."/classes/OwncloudFolder.class.php";
+require_once __DIR__."/classes/OwncloudFile.php";
+require_once __DIR__."/classes/OwncloudFolder.php";
 
 class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
 
@@ -14,6 +15,7 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
 
     public function getFolder($folder_id = null)
     {
+        Navigation::activateItem('/files/my_files');
         if ($folder_id[0] === "/") {
             $folder_id = substr($folder_id, 1);
         }
@@ -80,7 +82,7 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
         if (!$this->isFile($file_id)) {
             return null;
         }
-        
+
         $folder_path = explode("/", $file_id);
         $filename = rawurldecode(array_pop($folder_path));
         $folder_id = implode("/", $folder_path);
@@ -96,11 +98,13 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
         ), $this->getPluginId());
 
         foreach ($folder->getFiles() as $file_info) {
-            if ($file_info->name === $filename) {
+            if (($file_info->getFilename() === $file_id)
+                    || ($file_info->getFilename() === rawurldecode($file_id))) {
                 $info = $file_info;
                 break;
             }
         }
+        return $info;
 
         $file = new FileRef();
         $file->id           = $file_id;
@@ -112,7 +116,7 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
         $file->mkdate       = $info->chdate;
         $file->chdate       = $info->chdate;
         $file->content_terms_of_use_id = 'UNDEF_LICENSE';
-        
+
         if ($with_blob) {
             $url = Config::get()->OWNCLOUD_ENDPOINT ?: UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_ENDPOINT_USER;
             if ($url[strlen($url) - 1] !== "/") {
