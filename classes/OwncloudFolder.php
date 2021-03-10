@@ -125,27 +125,8 @@ class OwncloudFolder extends VirtualFolderType {
         $header = array();
         $header[] = self::getAuthHeader();
 
-        $url_template = "[InternetShortcut]\nURL=%s";
-
-        $data = $GLOBALS['TMP_PATH']."/file_".md5(uniqid());
-
-        if (is_a($file, "URLFile")) {
-            if ($filedata->getURL()) {
-                $data = $GLOBALS['TMP_PATH']."/file_".md5(uniqid());
-                file_put_contents($data, sprintf($url_template, $filedata->getURL()));
-                $file_ref_id .= ".url";
-            } else {
-                $data = $filedata->getPath();
-            }
-        } else {
-            if ($filedata['url']) {
-                $data = $GLOBALS['TMP_PATH']."/file_".md5(uniqid());
-                file_put_contents($data, sprintf($url_template, $filedata['url']));
-                $file_ref_id .= ".url";
-            } else {
-                $data = $filedata['tmp_name'];
-            }
-        }
+        $data = $file->getPath();
+        //Verlinkungen URLFile extra berücksichtigen?  $url_template = "[InternetShortcut]\nURL=%s";
         $fh_res = fopen($data, 'r');
 
         $r = curl_init();

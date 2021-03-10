@@ -98,7 +98,7 @@ class OwncloudFile implements FileType
      */
     public function getDownloads()
     {
-        return 0;
+        return null;
     }
 
 
@@ -178,31 +178,16 @@ class OwncloudFile implements FileType
             ['data-dialog' => ''],
             'file-display-info'
         );
-        if ($current_action === 'flat') {
-            if (Navigation::hasItem('/course/files') && Navigation::getItem('/course/files')->isActive()) {
-                $actionMenu->addLink(
-                    URLHelper::getURL('dispatch.php/course/files/index/' . $this->fileref->folder_id),
-                    _('Ordner öffnen'),
-                    Icon::create('folder-empty', Icon::ROLE_CLICKABLE, ['size' => 20])
-                );
-            } elseif (Navigation::hasItem('/files_dashboard/files') && Navigation::getItem('/files_dashboard/files')->isActive()) {
-                $actionMenu->addLink(
-                    URLHelper::getURL('dispatch.php/files/index/' . $this->fileref->folder_id),
-                    _('Ordner öffnen'),
-                    Icon::create('folder-empty', Icon::ROLE_CLICKABLE, ['size' => 20])
-                );
-            }
-        }
         if ($this->isEditable($GLOBALS['user']->id)) {
             $actionMenu->addLink(
-                URLHelper::getURL('dispatch.php/file/edit/' . $this->fileref->id),
+                URLHelper::getURL('dispatch.php/file/edit/' . $this->getId()),
                 _('Datei bearbeiten'),
                 Icon::create('edit', Icon::ROLE_CLICKABLE, ['size' => 20]),
                 ['data-dialog' => ''],
                 'file-edit'
             );
             $actionMenu->addLink(
-                URLHelper::getURL('dispatch.php/file/update/' . $this->fileref->id),
+                URLHelper::getURL('dispatch.php/file/update/' . $this->getId()),
                 _('Datei aktualisieren'),
                 Icon::create('refresh', Icon::ROLE_CLICKABLE, ['size' => 20]),
                 ['data-dialog' => ''],
@@ -211,7 +196,7 @@ class OwncloudFile implements FileType
         }
         if ($this->isWritable($GLOBALS['user']->id)) {
             $actionMenu->addLink(
-                URLHelper::getURL('dispatch.php/file/choose_destination/move/' . $this->fileref->id),
+                URLHelper::getURL('dispatch.php/file/choose_destination/move/' . $this->getId()),
                 _('Datei verschieben'),
                 Icon::create('file+move_right', Icon::ROLE_CLICKABLE, ['size' => 20]),
                 ['data-dialog' => 'size=auto'],
@@ -220,7 +205,7 @@ class OwncloudFile implements FileType
         }
         if ($this->isDownloadable($GLOBALS['user']->id) && $GLOBALS['user']->id !== 'nobody') {
             $actionMenu->addLink(
-                URLHelper::getURL('dispatch.php/file/choose_destination/copy/' . $this->fileref->id),
+                URLHelper::getURL('dispatch.php/file/choose_destination/copy/' . $this->getId()),
                 _('Datei kopieren'),
                 Icon::create('file+add', Icon::ROLE_CLICKABLE, ['size' => 20]),
                 ['data-dialog' => 'size=auto'],
@@ -233,16 +218,6 @@ class OwncloudFile implements FileType
                 ['class' => 'copyable-link'],
                 'link-to-clipboard'
             );
-        }
-        if (Context::isCourse() && Feedback::isActivated()) {
-            if (Feedback::hasCreatePerm(Context::getId())) {
-                $actionMenu->addLink(
-                    URLHelper::getURL('dispatch.php/course/feedback/create_form/'. $this->fileref->id . '/FileRef'),
-                    _('Neues Feedback-Element'),
-                    Icon::create('star+add', Icon::ROLE_CLICKABLE, ['size' => 20]),
-                    ['data-dialog' => '1']
-                );
-            }
         }
         if ($this->isWritable($GLOBALS['user']->id)) {
             $actionMenu->addButton(
@@ -344,7 +319,40 @@ class OwncloudFile implements FileType
      */
     public function convertToStandardFile()
     {
-        //TODO
+        $url = Config::get()->OWNCLOUD_ENDPOINT ?: UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_ENDPOINT_USER;
+        if ($url[strlen($url) - 1] !== "/") {
+            $url .= "/";
+        }
+        $webdav = $url . "remote.php/webdav/";
+
+        $header = array();
+        $header[] = OwnCloudFolder::getAuthHeader();
+
+        $r = curl_init();
+        curl_setopt($r, CURLOPT_CUSTOMREQUEST, "GET");
+        curl_setopt($r, CURLOPT_URL, $webdav.$file_id);
+        curl_setopt($r, CURLOPT_HTTPHEADER, ($header));
+        curl_setopt($r, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($r, CURLOPT_SSL_VERIFYPEER, (bool) Config::get()->OWNCLOUD_SSL_VERIFYPEER);
+        curl_setopt($r, CURLOPT_SSL_VERIFYHOST, (bool) Config::get()->OWNCLOUD_SSL_VERIFYPEER);
+        if ($GLOBALS['OWNCLOUD_VERBOSE']) {
+            curl_setopt($r, CURLOPT_VERBOSE, true);
+        }
+
+        $content = curl_exec($r);
+        $info = curl_getinfo($r);
+        curl_close($r);
+        $path = $GLOBALS['TMP_PATH']."/owncloudplugin_".md5(uniqid());
+        file_put_contents(
+            $path,
+            $content
+        );
+        return StandardFile::create([
+            'name'     => $this->getFilename(),
+            'type'     => $this->getMimeType(),
+            'size'     => $this->getSize(),
+            'tmp_name' => $path
+        ]);
     }
 
     /**
