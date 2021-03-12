@@ -84,73 +84,32 @@ class OwnCloudPlugin extends StudIPPlugin implements FilesystemPlugin {
         }
 
         $folder_path = explode("/", $file_id);
-        $filename = rawurldecode(array_pop($folder_path));
-        $folder_id = implode("/", $folder_path);
+        $folder_path = array_map("rawurldecode", $folder_path);
+        $filename = array_pop($folder_path);
+        $folder_id = implode("/", array_map("rawurlencode", $folder_path));
         $name = array_pop($folder_path);
-        $parent_folder_id = implode("/", $folder_path);
+        $parent_folder_id = implode("/", array_map("rawurlencode", $folder_path));
 
-        $folder = new OwncloudFolder(array(
+        $data = [
             'id' => $folder_id,
             'name' => $name,
             'parent_id' => $parent_folder_id,
             'range_type' => $this->getPluginId(),
             'range_id' => $this->getPluginName()
-        ), $this->getPluginId());
+        ];
 
-        foreach ($folder->getFiles() as $file_info) {
-            if (($file_info->getFilename() === $file_id)
-                    || ($file_info->getFilename() === rawurldecode($file_id))) {
-                $info = $file_info;
-                break;
+        $folder = new OwncloudFolder(
+            $data,
+            $this->getPluginId()
+        );
+
+        foreach ($folder->getFiles() as $file) {
+            if ($file->getFilename() === $filename) {
+                return $file;
             }
         }
-        return $info;
 
-        $file = new FileRef();
-        $file->id           = $file_id;
-        $file->foldertype   = $folder;
-        $file->name         = $filename;
-        $file->size         = $info->size;
-        $file->mime_type    = $info->mime_type;
-        $file->download_url = $info->download_url;
-        $file->mkdate       = $info->chdate;
-        $file->chdate       = $info->chdate;
-        $file->content_terms_of_use_id = 'UNDEF_LICENSE';
-
-        if ($with_blob) {
-            $url = Config::get()->OWNCLOUD_ENDPOINT ?: UserConfig::get($GLOBALS['user']->id)->OWNCLOUD_ENDPOINT_USER;
-            if ($url[strlen($url) - 1] !== "/") {
-                $url .= "/";
-            }
-            $webdav = $url . "remote.php/webdav/";
-
-
-            $header = array();
-            $header[] = OwnCloudFolder::getAuthHeader();
-
-            $r = curl_init();
-            curl_setopt($r, CURLOPT_CUSTOMREQUEST, "GET");
-            curl_setopt($r, CURLOPT_URL, $webdav.$file_id);
-            curl_setopt($r, CURLOPT_HTTPHEADER, ($header));
-            curl_setopt($r, CURLOPT_RETURNTRANSFER, 1);
-            curl_setopt($r, CURLOPT_SSL_VERIFYPEER, (bool) Config::get()->OWNCLOUD_SSL_VERIFYPEER);
-            curl_setopt($r, CURLOPT_SSL_VERIFYHOST, (bool) Config::get()->OWNCLOUD_SSL_VERIFYPEER);
-            if ($GLOBALS['OWNCLOUD_VERBOSE']) {
-                curl_setopt($r, CURLOPT_VERBOSE, true);
-            }
-
-            $content = curl_exec($r);
-            $info = curl_getinfo($r);
-            curl_close($r);
-            $path = $GLOBALS['TMP_PATH']."/".md5(uniqid());
-            file_put_contents(
-                $path,
-                $content
-            );
-            $file->path_to_blob = $path;
-        }
-
-        return $file;
+        return null;
     }
 
     public function filesystemConfigurationURL()

@@ -328,9 +328,11 @@ class OwncloudFile implements FileType
         $header = array();
         $header[] = OwnCloudFolder::getAuthHeader();
 
+        $url = $webdav.$this->getFolderType()->getId()."/".$this->getFilename();
+
         $r = curl_init();
         curl_setopt($r, CURLOPT_CUSTOMREQUEST, "GET");
-        curl_setopt($r, CURLOPT_URL, $webdav.$file_id);
+        curl_setopt($r, CURLOPT_URL, $url);
         curl_setopt($r, CURLOPT_HTTPHEADER, ($header));
         curl_setopt($r, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($r, CURLOPT_SSL_VERIFYPEER, (bool) Config::get()->OWNCLOUD_SSL_VERIFYPEER);
@@ -340,6 +342,7 @@ class OwncloudFile implements FileType
         }
 
         $content = curl_exec($r);
+
         $info = curl_getinfo($r);
         curl_close($r);
         $path = $GLOBALS['TMP_PATH']."/owncloudplugin_".md5(uniqid());
@@ -352,7 +355,7 @@ class OwncloudFile implements FileType
             'type'     => $this->getMimeType(),
             'size'     => $this->getSize(),
             'tmp_name' => $path
-        ]);
+        ], "owncloud");
     }
 
     /**
@@ -392,6 +395,26 @@ class OwncloudFile implements FileType
      */
     public function getInfoTemplate(bool $include_downloadable_infos = false)
     {
-        return null;
+        if (!$include_downloadable_infos) {
+            return null;
+        }
+        $mime_type = $this->getMimeType();
+        $relevant_mime_type = false;
+        if (FileManager::fileIsImage($this) || FileManager::fileIsAudio($this)
+            || FileManager::fileIsVideo($this) ||
+            in_array($mime_type, ['application/pdf', 'text/plain'])) {
+            $relevant_mime_type = true;
+        }
+        if (!$relevant_mime_type) {
+            return null;
+        }
+
+        $factory = new Flexi_TemplateFactory(
+            $GLOBALS['STUDIP_BASE_PATH'] . '/templates/filesystem/file_types/'
+        );
+        $template = $factory->open('standard_file_info');
+        $template->set_attribute('mime_type', $mime_type);
+        $template->set_attribute('file', $this);
+        return $template;
     }
 }
